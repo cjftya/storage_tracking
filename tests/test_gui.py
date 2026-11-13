@@ -2,6 +2,8 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 
 from storage_scanner.core.models import FileMatch
 from storage_scanner.core.results import MemoryResultStore
@@ -25,6 +27,43 @@ class GuiTests(unittest.TestCase):
         self.view.pack(fill="both", expand=True)
         self.errors = []
         self.root.report_callback_exception = lambda *args: self.errors.append(args)
+        info_patch = patch("storage_scanner.gui.app.messagebox.showinfo")
+        error_patch = patch("storage_scanner.gui.app.messagebox.showerror")
+        self.showinfo = info_patch.start()
+        self.showerror = error_patch.start()
+        self.addCleanup(info_patch.stop)
+        self.addCleanup(error_patch.stop)
+
+    def make_app(self, directory, minimum=0):
+        from storage_scanner.gui.app import ScannerApp
+        if self.view.winfo_exists():
+            self.view.destroy()
+        settings = {"roots": (directory,), "min_size_bytes": minimum, "extra_exclusions": (),
+                    "include_removable": False, "use_default_exclusions": True, "update_ms": 50}
+        app = ScannerApp(self.root, settings)
+
+        def cleanup():
+            app.controller.close()
+            for timer in (app._timer, app._discover_timer, app._notification_timer):
+                if timer:
+                    self.root.after_cancel(timer)
+
+        self.addCleanup(cleanup)
+        deadline = time.perf_counter() + 5
+        while app.discovery is None and time.perf_counter() < deadline:
+            self.root.update()
+            time.sleep(0.002)
+        self.assertIsNotNone(app.discovery, app.status.get())
+        return app
+
+    def wait_until(self, predicate, timeout=5):
+        deadline = time.perf_counter() + timeout
+        while time.perf_counter() < deadline:
+            self.root.update()
+            if predicate():
+                return
+            time.sleep(0.002)
+        self.fail("GUI condition did not become true")
 
     def test_lazy_render_and_paging_for_20000_matches(self):
         folder = path_key(str(Path.cwd() / "stress"))
@@ -86,6 +125,7 @@ class GuiTests(unittest.TestCase):
             self.assertTrue(result.finished)
             self.assertEqual(result.store.match_count, 1)
             self.assertIn("matches 1", app.status.get())
+            self.assertEqual(self.showinfo.call_count, 1)
             self.assertFalse(self.errors)
             for timer in (app._timer, app._discover_timer):
                 if timer:
@@ -135,6 +175,9 @@ class GuiTests(unittest.TestCase):
                     self.root.after(40, app.cancel)
                     while not app.controller.snapshot().finished and time.perf_counter() < deadline:
                         self.root.update()
+                        if not app.controller.snapshot().finished:
+                            self.assertIsNone(app.results.store)
+                            self.assertFalse(app.results.tree.get_children())
                         time.sleep(0.002)
                     first = app.controller.snapshot()
                     self.assertTrue(first.summary.cancelled)
@@ -145,6 +188,8 @@ class GuiTests(unittest.TestCase):
                         snapshot = app.controller.snapshot()
                         if snapshot.finished:
                             break
+                        self.assertIsNone(app.results.store)
+                        self.assertFalse(app.results.tree.get_children())
                         time.sleep(0.002)
                     self.assertTrue(snapshot.finished)
                     self.assertEqual(snapshot.store.match_count, 20000)
@@ -154,3 +199,96 @@ class GuiTests(unittest.TestCase):
                 for timer in (heartbeat_timer, app._timer, app._discover_timer):
                     if timer:
                         self.root.after_cancel(timer)
+
+    def test_completed_tree_totals_and_notification_are_not_refreshed_each_tick(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            for name in ("a", "b", "c"):
+                folder = Path(directory) / name
+                folder.mkdir()
+                with (folder / "matching.bin").open("wb") as handle:
+                    handle.truncate(100)
+            with (Path(directory) / "small.bin").open("wb") as handle:
+                handle.truncate(99)
+            app = self.make_app(directory, minimum=100)
+            with patch.object(app.results, "reset", wraps=app.results.reset) as reset, patch.object(
+                    app.results, "refresh", wraps=app.results.refresh) as refresh:
+                app.start()
+                self.wait_until(lambda: self.showinfo.called)
+                self.assertEqual(reset.call_count, 2)  # Clear at start, attach completed store once.
+                folder = path_key(directory)
+                item = app.results._items[folder]
+                self.assertEqual(app.results.tree.item(item, "values")[1], "300")
+                before = refresh.call_count
+                for _ in range(3):
+                    self.root.after_cancel(app._timer)
+                    app._tick()
+                    self.root.update()
+                self.assertEqual(reset.call_count, 2)
+                self.assertEqual(refresh.call_count, before)
+                self.assertEqual(self.showinfo.call_count, 1)
+                app.results.tree.item(item, open=True)
+                app.results.tree.focus(item)
+                app.results.tree.event_generate("<<TreeviewOpen>>")
+                self.root.update()
+                children = app.results.tree.get_children(item)
+                self.assertEqual(len(children), 3)
+                self.assertTrue(all(app.results.tree.item(child, "values")[1] == "100" for child in children))
+                self.assertEqual(app.results.tree.item(item, "values")[1], "300")
+                self.assertFalse(self.errors)
+
+    def test_context_menu_opens_only_the_right_clicked_folder(self):
+        folder = path_key(str(Path.cwd() / "context folder"))
+        store = MemoryResultStore((folder,))
+        store.add_batch((FileMatch(str(Path(folder) / "file.bin"), 300),))
+        opened = []
+        self.view.on_open_folder = opened.append
+        self.view.reset(store)
+        self.root.update()
+        item = self.view._items[folder]
+        event = SimpleNamespace(type=SimpleNamespace(name="ButtonPress"), y=10, x_root=20, y_root=30)
+        with patch.object(self.view.tree, "identify_row", return_value=item), patch.object(
+                self.view.menu, "tk_popup") as popup, patch.object(self.view.menu, "grab_release"):
+            self.assertEqual(self.view._show_context_menu(event), "break")
+            popup.assert_called_once_with(20, 30)
+        self.assertEqual(self.view.tree.selection(), (item,))
+        self.view.menu.invoke(0)
+        self.assertEqual(opened, [folder])
+        self.view.tree.item(item, open=True)
+        self.view.tree.focus(item)
+        self.view._open()
+        self.root.update()
+        file_item = self.view.tree.get_children(item)[0]
+        with patch.object(self.view.tree, "identify_row", return_value=file_item), patch.object(
+                self.view.menu, "tk_popup") as popup:
+            self.view._show_context_menu(event)
+            popup.assert_not_called()
+        self.view.reset(None)
+        self.view._open_context_folder()
+        self.assertEqual(opened, [folder])
+
+    def test_folder_open_errors_are_reported_on_gui_thread(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            app = self.make_app(directory)
+            with patch("storage_scanner.gui.app.open_folder", side_effect=OSError("folder disappeared")):
+                app.open_folder(directory)
+                self.wait_until(lambda: self.showerror.called)
+            self.assertEqual(self.showerror.call_args.args[0], "폴더 열기 실패")
+            self.assertIn("folder disappeared", self.showerror.call_args.args[1])
+            self.assertFalse(self.errors)
+
+    def test_cancelled_and_superseded_runs_do_not_show_completion_dialog(self):
+        from storage_scanner.gui.controller import RunSnapshot
+        from storage_scanner.core.models import ScanProgress, ScanSummary
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            app = self.make_app(directory)
+            app.run_id = 2
+            cancelled = RunSnapshot(2, MemoryResultStore((directory,)), ScanProgress(),
+                                    ScanSummary(0, 0, 0, 0, 0.1, True), True, None, 0.1)
+            with patch.object(app.controller, "snapshot", return_value=cancelled):
+                self.root.after_cancel(app._timer)
+                app._tick()
+                self.root.update()
+            old = RunSnapshot(1, cancelled.store, ScanProgress(),
+                              ScanSummary(0, 0, 0, 0, 0.1, False), True, None, 0.1)
+            app._notify_finished(old)
+            self.showinfo.assert_not_called()

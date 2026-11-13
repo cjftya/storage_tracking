@@ -51,3 +51,23 @@ class ResultTests(unittest.TestCase):
         store.add_batch((FileMatch(os.path.join(nested, "f"), 1), self.match("a")))
         self.assertEqual(store.child_count(None), 2)
         self.assertEqual(self.store.match_count, 0)
+
+    def test_folder_totals_include_all_matching_descendants_once(self):
+        matches = tuple(self.match(os.path.join(name, "nested", "file"), 100)
+                        for name in ("a", "b", "c"))
+        self.store.add_batch(matches)
+        self.store.add_batch(matches)  # A duplicate batch must not inflate totals.
+        self.assertEqual(self.store.children(None)[0].size_bytes, 300)
+        self.assertEqual([n.size_bytes for n in self.store.children(self.root)], [100, 100, 100])
+        for name in ("a", "b", "c"):
+            parent = os.path.join(self.root, name)
+            self.assertEqual(self.store.children(parent)[0].size_bytes, 100)
+
+    def test_totals_across_chunks_and_nested_roots(self):
+        nested = os.path.join(self.root, "nested")
+        store = MemoryResultStore((self.root, nested))
+        store.add_batch(tuple(self.match(os.path.join("a", f"{i}.bin"), 100) for i in range(130)))
+        store.add_batch((FileMatch(os.path.join(nested, "separate.bin"), 500),))
+        totals = {node.path: node.size_bytes for node in store.children(None)}
+        self.assertEqual(totals[self.root], 13000)
+        self.assertEqual(totals[nested], 500)

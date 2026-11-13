@@ -7,12 +7,13 @@ from storage_scanner.core.filters import mib_to_bytes, bytes_to_mib
 from storage_scanner.gui.controller import ScanController
 from storage_scanner.gui.tree_view import ResultTree
 from storage_scanner.options import configured_scan
+from storage_scanner.platform_fs.actions import open_folder
 from storage_scanner.platform_fs.paths import path_key
 from storage_scanner.platform_fs.volumes import make_config
 
 
 class ScannerApp:
-    def __init__(self, root, settings):
+    def __init__(self, root, settings, *, notify_on_completion=True):
         self.root = root
         self.settings = dict(settings)
         self.update_ms = settings.get("update_ms", 700)
@@ -21,10 +22,16 @@ class ScannerApp:
         self.controller = ScanController()
         self.discovery = None
         self.run_id = None
+        self._presented_run_id = None
+        self._notified_run_id = None
+        self.notify_on_completion = notify_on_completion
         self._closed = False
         self._timer = None
         self._discover_timer = None
+        self._notification_timer = None
         self._discover_results = queue.Queue(maxsize=1)
+        self._folder_open_results = queue.Queue(maxsize=1)
+        self._opening_folder = False
         self.root.title("Storage Scanner")
         self.root.geometry("1100x800")
         self.root.minsize(760, 600)
@@ -55,7 +62,9 @@ class ScannerApp:
         scope.columnconfigure(1, weight=1)
         ttk.Label(scope, text="Local volumes only; directory links are skipped. Expand folders to load matches.").grid(
             row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
-        self.results = ResultTree(frame)
+        ttk.Label(frame, text="폴더 용량은 하위 검색 결과 파일의 합계입니다. 검색이 끝나면 결과를 표시합니다.").pack(
+            fill="x", pady=(0, 6))
+        self.results = ResultTree(frame, on_open_folder=self.open_folder)
         self.results.pack(fill="both", expand=True)
         self.status = tk.StringVar(value="Discovering local volumes…")
         self.current_path = tk.StringVar()
@@ -126,7 +135,12 @@ class ScannerApp:
             return
         snapshot = self.controller.start(config)
         self.run_id = snapshot.run_id
-        self.results.reset(snapshot.store)
+        self._presented_run_id = None
+        self._notified_run_id = None
+        if self._notification_timer is not None:
+            self.root.after_cancel(self._notification_timer)
+            self._notification_timer = None
+        self.results.reset(None)
         self.cancel_button.configure(state="normal")
         self.status.set("Scanning…")
         self.current_path.set("")
@@ -138,25 +152,75 @@ class ScannerApp:
 
     def _tick(self):
         self._timer = None
+        self._poll_folder_open()
         snapshot = self.controller.snapshot()
         if snapshot and snapshot.run_id == self.run_id:
-            self.results.refresh()
             progress = snapshot.progress
             state = "Scanning"
             if snapshot.finished:
                 self.cancel_button.configure(state="disabled")
                 state = "Failed" if snapshot.error else "Cancelled" if snapshot.summary.cancelled else "Completed"
+                if self._presented_run_id != snapshot.run_id:
+                    self.results.reset(snapshot.store)
+                    self._presented_run_id = snapshot.run_id
             self.status.set(f"{state} | scanned {progress.files_scanned:,} files / {progress.directories_scanned:,} folders"
                             f" | matches {progress.files_matched:,} | errors {progress.errors:,}"
                             f" | {snapshot.elapsed_seconds:.1f} s")
             self.current_path.set(snapshot.error or progress.current_directory)
+            if snapshot.finished and self._notified_run_id != snapshot.run_id:
+                self._notified_run_id = snapshot.run_id
+                if self.notify_on_completion and (snapshot.error or not snapshot.summary.cancelled):
+                    self._notification_timer = self.root.after_idle(self._notify_finished, snapshot)
         if not self._closed:
             self._timer = self.root.after(self.update_ms, self._tick)
+
+    def _notify_finished(self, snapshot):
+        self._notification_timer = None
+        if self._closed or snapshot.run_id != self.run_id:
+            return
+        if snapshot.error:
+            messagebox.showerror("검색 실패", snapshot.error, parent=self.root)
+            return
+        summary = snapshot.summary
+        messagebox.showinfo(
+            "검색 완료",
+            f"검색이 완료되었습니다.\n\n"
+            f"검색한 파일: {summary.files_scanned:,}개\n"
+            f"일치한 파일: {summary.files_matched:,}개\n"
+            f"오류: {summary.errors:,}개\n"
+            f"소요 시간: {summary.elapsed_seconds:.1f}초\n\n"
+            "폴더 용량은 하위 검색 결과 파일의 합계입니다.", parent=self.root)
+
+    def open_folder(self, path):
+        if self._opening_folder:
+            return
+        self._opening_folder = True
+
+        def work():
+            error = None
+            try:
+                open_folder(path)
+            except Exception as exc:
+                error = getattr(exc, "stderr", None) or str(exc) or type(exc).__name__
+            self._folder_open_results.put(error)
+
+        Thread(target=work, name="open-folder", daemon=True).start()
+
+    def _poll_folder_open(self):
+        if not self._opening_folder:
+            return
+        try:
+            error = self._folder_open_results.get_nowait()
+        except queue.Empty:
+            return
+        self._opening_folder = False
+        if error:
+            messagebox.showerror("폴더 열기 실패", error, parent=self.root)
 
     def close(self):
         self._closed = True
         self.controller.close()
-        for timer in (self._timer, self._discover_timer):
+        for timer in (self._timer, self._discover_timer, self._notification_timer):
             if timer:
                 self.root.after_cancel(timer)
         self.root.destroy()

@@ -20,7 +20,7 @@ def gui_measure(path, minimum):
     root = tk.Tk()
     settings = {"roots": (path,), "min_size_bytes": minimum, "extra_exclusions": (),
                 "include_removable": False, "use_default_exclusions": True, "update_ms": 700}
-    app = ScannerApp(root, settings)
+    app = ScannerApp(root, settings, notify_on_completion=False)
     output = {}
     started = None
     deadline = time.perf_counter() + 120

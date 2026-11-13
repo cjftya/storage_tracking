@@ -1,5 +1,5 @@
 """Thread-safe append-only result index; never builds unmatched folders."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import os
 from threading import RLock
 from typing import Protocol
@@ -28,6 +28,7 @@ class MemoryResultStore:
         self._roots = tuple(sorted(set(path_key(p) for p in roots), key=len, reverse=True))
         self._nodes: dict[str, ResultNode] = {}
         self._children: dict[str | None, list[str]] = {None: []}
+        self._parents: dict[str, str | None] = {}
         self._changes: set[str | None] = set()
         self._count = 0
         self._lock = RLock()
@@ -41,6 +42,7 @@ class MemoryResultStore:
         # Release the lock regularly so a GUI page read cannot wait for a huge batch.
         for offset in range(0, len(matches), 64):
             with self._lock:
+                direct_sizes: dict[str, int] = {}
                 for match in matches[offset:offset + 64]:
                     key = path_key(match.path)
                     if key in self._nodes:
@@ -71,12 +73,24 @@ class MemoryResultStore:
                             name = folder if ancestor is None else display_name
                             self._nodes[folder] = ResultNode(folder, name, True)
                             self._children[folder] = []
+                            self._parents[folder] = ancestor
                             self._children[ancestor].append(folder)
                             self._changes.add(ancestor)
                     self._nodes[key] = ResultNode(key, os.path.basename(match.path), False, match.size_bytes)
                     self._children[parent].append(key)
                     self._changes.add(parent)
                     self._count += 1
+                    direct_sizes[parent] = direct_sizes.get(parent, 0) + match.size_bytes
+                # Apply each folder's byte delta once per chunk. Parent links
+                # follow the displayed tree, including separately scanned roots.
+                totals: dict[str, int] = {}
+                for folder, size in direct_sizes.items():
+                    while folder is not None:
+                        totals[folder] = totals.get(folder, 0) + size
+                        folder = self._parents[folder]
+                for folder, size in totals.items():
+                    node = self._nodes[folder]
+                    self._nodes[folder] = replace(node, size_bytes=node.size_bytes + size)
 
     def children(self, parent, offset=0, limit=200):
         if offset < 0 or limit < 0:

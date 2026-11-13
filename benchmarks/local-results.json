@@ -10,10 +10,10 @@
         "directories_scanned": 3001,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.24299799999971583,
+        "elapsed_seconds": 0.25525519999973767,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\empty_directories"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\empty_directories"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -31,17 +31,17 @@
         "python": "3.13.15",
         "store_enabled": false,
         "files_per_second": 0.0,
-        "peak_process_memory_bytes": 26587136
+        "peak_process_memory_bytes": 26578944
       },
       "store": {
         "files_scanned": 0,
         "directories_scanned": 3001,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.2996160000002419,
+        "elapsed_seconds": 0.2591245000003255,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\empty_directories"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\empty_directories"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -59,22 +59,22 @@
         "python": "3.13.15",
         "store_enabled": true,
         "files_per_second": 0.0,
-        "peak_process_memory_bytes": 26599424
+        "peak_process_memory_bytes": 26296320
       },
       "gui": {
         "files_scanned": 0,
         "directories_scanned": 3001,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.2849673000000621,
+        "elapsed_seconds": 0.3134350000000268,
         "cancelled": false,
-        "gui_wall_seconds": 0.6045678000000407,
-        "tree_refresh_seconds": 6.089999988034833e-05,
+        "gui_wall_seconds": 0.6166503000004013,
+        "tree_refresh_seconds": 5.2400000640773214e-05,
         "tree_refresh_count": 1,
-        "max_heartbeat_gap_seconds": 0.029911399999946298,
+        "max_heartbeat_gap_seconds": 0.03109760000006645,
         "stored_matches": 0,
         "rendered_nodes": 0,
-        "peak_process_memory_bytes": 47902720,
+        "peak_process_memory_bytes": 48975872,
         "error": null
       }
     },
@@ -84,10 +84,10 @@
         "directories_scanned": 1,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.010709199999837438,
+        "elapsed_seconds": 0.010909700000411249,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_files_no_matches"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\many_files_no_matches"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -104,18 +104,18 @@
         "platform": "Windows-11-10.0.26300-SP0",
         "python": "3.13.15",
         "store_enabled": false,
-        "files_per_second": 280132.96978724265,
-        "peak_process_memory_bytes": 25964544
+        "files_per_second": 274984.646680194,
+        "peak_process_memory_bytes": 26284032
       },
       "store": {
         "files_scanned": 3000,
         "directories_scanned": 1,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.008554000000003725,
+        "elapsed_seconds": 0.007302699999854667,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_files_no_matches"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\many_files_no_matches"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -132,23 +132,23 @@
         "platform": "Windows-11-10.0.26300-SP0",
         "python": "3.13.15",
         "store_enabled": true,
-        "files_per_second": 350713.11667041073,
-        "peak_process_memory_bytes": 26304512
+        "files_per_second": 410806.9618168217,
+        "peak_process_memory_bytes": 26255360
       },
       "gui": {
         "files_scanned": 3000,
         "directories_scanned": 1,
         "files_matched": 0,
         "errors": 0,
-        "elapsed_seconds": 0.011634800000138057,
+        "elapsed_seconds": 0.007920100000774255,
         "cancelled": false,
-        "gui_wall_seconds": 0.6075755000001664,
-        "tree_refresh_seconds": 2.570000015111873e-05,
+        "gui_wall_seconds": 0.5981289000010293,
+        "tree_refresh_seconds": 2.390000008745119e-05,
         "tree_refresh_count": 1,
-        "max_heartbeat_gap_seconds": 0.02635920000011538,
+        "max_heartbeat_gap_seconds": 0.027114299999084324,
         "stored_matches": 0,
         "rendered_nodes": 0,
-        "peak_process_memory_bytes": 47562752,
+        "peak_process_memory_bytes": 48803840,
         "error": null
       }
     },
@@ -158,10 +158,10 @@
         "directories_scanned": 1,
         "files_matched": 3000,
         "errors": 0,
-        "elapsed_seconds": 0.022835700000541692,
+        "elapsed_seconds": 0.016910499998630257,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_matches"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\many_matches"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -178,18 +178,18 @@
         "platform": "Windows-11-10.0.26300-SP0",
         "python": "3.13.15",
         "store_enabled": false,
-        "files_per_second": 131373.2445219037,
-        "peak_process_memory_bytes": 26406912
+        "files_per_second": 177404.57113881898,
+        "peak_process_memory_bytes": 26443776
       },
       "store": {
         "files_scanned": 3000,
         "directories_scanned": 1,
         "files_matched": 3000,
         "errors": 0,
-        "elapsed_seconds": 0.04739119999976538,
+        "elapsed_seconds": 0.03896899999926973,
         "cancelled": false,
         "roots": [
-          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_matches"
+          "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\storage-scanner-benchmark-dk1x70x0\\many_matches"
         ],
         "excluded_paths": [
           "C:\\WINDOWS",
@@ -206,23 +206,23 @@
         "platform": "Windows-11-10.0.26300-SP0",
         "python": "3.13.15",
         "store_enabled": true,
-        "files_per_second": 63302.89167640516,
-        "peak_process_memory_bytes": 27201536
+        "files_per_second": 76984.26954903179,
+        "peak_process_memory_bytes": 27152384
       },
       "gui": {
         "files_scanned": 3000,
         "directories_scanned": 1,
         "files_matched": 3000,
         "errors": 0,
-        "elapsed_seconds": 0.07341830000041227,
+        "elapsed_seconds": 0.04821980000087933,
         "cancelled": false,
-        "gui_wall_seconds": 1.9236746999995376,
-        "tree_refresh_seconds": 0.003349499999785621,
+        "gui_wall_seconds": 0.6488922999997158,
+        "tree_refresh_seconds": 0.0024602000012237113,
         "tree_refresh_count": 3,
-        "max_heartbeat_gap_seconds": 0.09387419999984559,
+        "max_heartbeat_gap_seconds": 0.03662160000021686,
         "stored_matches": 3000,
         "rendered_nodes": 201,
-        "peak_process_memory_bytes": 48750592,
+        "peak_process_memory_bytes": 49545216,
         "error": null
       }
     }
