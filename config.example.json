@@ -1,0 +1,7 @@
+{
+  "min_size_mib": "100",
+  "include_removable": false,
+  "use_default_exclusions": true,
+  "excluded_paths": [],
+  "gui_update_ms": 700
+}

@@ -1,1 +1,173 @@
-# storage_tracking
+# 스토리지 스캐너 (Storage Scanner v1)
+
+Windows와 Linux의 로컬 스토리지에서 **지정한 크기 이상(`>=`)의 일반 파일**을 찾는 Python 프로그램입니다. 기본 기준은 **100 MiB = 104,857,600바이트**입니다. 내용은 읽지 않고 메타데이터의 논리적 파일 크기만 확인하며, 파일을 수정·이동·삭제하지 않습니다.
+
+## 주요 기능
+
+- 접근 가능한 로컬 볼륨을 자동으로 찾고, 네트워크·가상 파일시스템과 시스템 경로를 기본 제외합니다.
+- 최소 파일 크기, 검색 경로, 제외 경로와 이동식 장치 포함 여부를 설정할 수 있습니다.
+- 검색 중에도 화면을 조작할 수 있으며, 취소와 재시작을 지원합니다.
+- 일치 파일과 그 상위 폴더만 표시하고, 폴더를 펼칠 때 결과를 나누어 불러옵니다.
+- 화면과 독립된 스캔 엔진, 자동 테스트, 성능 측정 도구를 제공합니다.
+
+## 실행
+
+Python **3.12 이상**과 Tkinter가 필요합니다. pip 의존성은 없습니다. Windows Python에는 보통 Tkinter가 포함됩니다. Linux에서는 배포판의 Tk 패키지(예: `python3-tk`)와 그래픽 세션이 필요합니다. GUI 없는 벤치마크는 Tkinter 없이 실행됩니다.
+
+프로젝트 루트에서:
+
+```powershell
+python -m storage_scanner
+# 또는
+python main.py
+
+# 특정 폴더, 250 MiB 이상
+python -m storage_scanner "C:\Users\사용자\Downloads" --min-size-mib 250
+
+# JSON 설정 적용
+python -m storage_scanner --config config.example.json
+```
+
+Linux 예시:
+
+```bash
+python3 -m storage_scanner /home --min-size-mib 100 --exclude /home/me/cache
+```
+
+시작 시 백그라운드에서 볼륨을 검색합니다. GUI의 Roots / Excluded paths는 줄마다 경로를 하나씩 입력해 수정할 수 있습니다. **Start / Restart**로 시작하거나 재시작하고 **Cancel**로 취소합니다. 이동식 장치 옵션을 바꾼 뒤 **Discover volumes**를 누르면 검색 범위와 기본 제외 목록을 다시 채웁니다. 재검색은 편집한 경로 목록을 대체합니다. 검색 시작 시 입력한 설정을 고정하므로, 진행 중 편집은 다음 실행부터 적용됩니다.
+
+화면에 표시되는 항목은 다음과 같습니다.
+
+| 화면 항목 | 사용 방법 |
+| --- | --- |
+| Minimum size (MiB, ≥) | 이 크기 이상의 파일을 찾습니다. 기본값은 100입니다. |
+| Roots | 검색할 경로를 한 줄에 하나씩 입력합니다. |
+| Excluded paths | 검색에서 제외할 경로를 한 줄에 하나씩 입력합니다. |
+| Include removable | 이동식 로컬 장치를 포함합니다. 변경 후 볼륨 재검색이 필요합니다. |
+| Discover volumes | 현재 장치를 다시 확인하고 검색·제외 경로를 채웁니다. |
+| Start / Restart | 현재 설정으로 검색을 시작하거나 다시 시작합니다. |
+| Cancel | 진행 중인 검색을 취소합니다. 이미 수집한 결과는 확인할 수 있습니다. |
+| Load next 200… | 해당 폴더의 다음 결과 200개를 불러옵니다. |
+
+트리에는 일치 파일과 관련된 상위 폴더만 나타납니다. 폴더를 펼치면 최대 200개씩 불러오며, 이후 항목은 **Load next 200…**을 더블클릭하거나 선택 후 Enter로 표시합니다. 순서는 파일시스템 탐색 순서이며 스캔 중 정렬하지 않습니다. 파일 크기는 읽기 쉬운 단위와 정확한 바이트를 함께 표시합니다. 진행률(%)이나 미리 추정한 완료 시간은 표시하지 않습니다.
+
+## 검색 범위와 제외 정책
+
+정책 코드는 `storage_scanner/platform_fs/`에 분리되어 있습니다. CLI `--exclude`는 반복할 수 있고 JSON `excluded_paths`와 합쳐집니다. `--no-default-excludes` 또는 JSON `use_default_exclusions: false`로 선택적인 시스템 경로 제외를 해제할 수 있습니다. GUI에서 제외 목록도 직접 편집할 수 있습니다. Linux의 필수 가상 경로와 거부된 마운트 경계는 유지됩니다.
+
+| OS | 기본 검색 범위 | 기본 제외 |
+| --- | --- | --- |
+| Windows | Windows API와 `os.listvolumes/listmounts`로 찾은 고정 로컬 볼륨. 드라이브 문자 없는 폴더 마운트도 포함 | `%SystemRoot%`(보통 `C:\Windows`), 각 볼륨의 `System Volume Information`, `$Recycle.Bin`, `Recovery`, `$WinREAgent` |
+| Linux | `/proc/self/mountinfo`의 로컬 디스크 파일시스템. 로컬 `/` 포함 | `/proc`, `/sys`, `/dev`, `/run` 및 `/usr`, `/bin`, `/sbin`, `/lib`, `/lib64`, `/boot`, `/etc` |
+
+- Windows의 `Users`, `ProgramData`, 다운로드 폴더는 시스템 드라이브에 있다는 이유로 제외하지 않습니다. Windows 경로는 대소문자 구분 없이 **경로 경계**로 비교하므로 `C:\WindowsBackup`은 `C:\Windows` 제외에 해당하지 않습니다.
+- Linux의 `/home`, `/mnt`, `/media`, `/opt`, `/var`는 일괄 제외하지 않습니다. 로컬 타입은 ext2/3/4, xfs, btrfs, f2fs, vfat, exfat, ntfs/ntfs3, fuseblk, zfs 등이며, 알려지지 않은 타입은 `/dev/` 기반 소스일 때만 허용합니다. 전체 타입 목록은 `platform_fs/linux.py`에 공개되어 있습니다.
+- NFS, CIFS/SMB, SSHFS 등의 네트워크 파일시스템과 proc/sysfs/tmpfs/cgroup 등 가상 파일시스템은 제외합니다. 컨테이너에서 루트 `/`인 overlay/aufs만 예외로 허용합니다. `/proc`, `/sys`, `/dev`, `/run`은 사용자가 선택적 제외를 해제해도 스캔하지 않습니다.
+- 이동식 장치는 기본 제외합니다. `--include-removable`, JSON `include_removable: true`, GUI 옵션으로 포함할 수 있습니다. Windows는 `GetDriveTypeW`, Linux는 sysfs 블록 장치의 `removable` 플래그를 사용합니다. USB 디스크도 OS가 고정 디스크로 보고하면 기본 검색 대상입니다. Linux 장치 정보가 없으면 비이동식으로 취급합니다.
+- 선택되지 않은 마운트도 경계로 기록하므로 상위 루트에서 네트워크·가상·이동식 마운트로 내려가지 않습니다. 중첩 로컬 마운트는 별도 루트에서 한 번씩 스캔합니다. 동일 볼륨의 별칭과 확인 가능한 Linux bind 별칭을 제거합니다. GUI/CLI의 명시적 루트도 선택된 로컬 볼륨 안이어야 합니다.
+- Linux의 파일 단위 bind 마운트도 경계로 처리하며, 선택된 로컬 파일 마운트는 별도 파일 루트로 한 번만 집계합니다. 일반 파일을 명시적 루트로 지정하는 것도 지원합니다.
+- 심볼릭 링크와 Windows junction/reparse 디렉터리는 따라가지 않습니다. Windows에서 볼륨 마운트로 확인된 검색 루트만 예외입니다. 임의 junction을 검색하려면 실제 대상 경로를 루트로 선택하세요.
+
+자동 시스템 경로 식별은 완전하지 않습니다. 추가 시스템/복구 폴더는 제외 목록에 넣으세요. 스캔 도중 마운트가 변경되는 상황까지 원자적으로 보장하지는 않습니다. 저장소 상태가 바뀌면 볼륨을 재검색한 후 다시 스캔하세요.
+
+## 설정 파일과 명령줄 옵션
+
+JSON 예시는 [config.example.json](config.example.json)에 있습니다. Windows에서 검색 경로를 지정하는 설정은 다음과 같습니다.
+
+```json
+{
+  "roots": ["C:\\Data"],
+  "min_size_mib": "100",
+  "include_removable": false,
+  "use_default_exclusions": true,
+  "excluded_paths": ["C:\\Data\\cache"],
+  "gui_update_ms": 700
+}
+```
+
+Linux에서는 경로를 `/home` 등으로 바꾸면 됩니다. `roots`를 생략하면 로컬 볼륨을 자동으로 찾습니다. 상대 경로는 실행 디렉터리 기준 절대 경로로 바꿉니다. 명령줄에서 지정한 검색 경로와 최소 크기는 JSON 값보다 우선합니다. 최소 크기는 소수 MiB도 허용하되 정확히 정수 바이트로 환산되어야 합니다. GUI 갱신 주기는 `gui_update_ms`로 조정하며 기본 700ms, 최솟값 50ms입니다. 설정 파일은 읽기만 하며 GUI 편집 내용은 자동 저장하지 않습니다.
+
+| 명령줄 옵션 | 설명 |
+| --- | --- |
+| `--min-size-mib 250` | 최소 파일 크기를 250 MiB로 지정합니다. |
+| `--exclude 경로` | 경로를 제외합니다. 여러 번 지정할 수 있습니다. |
+| `--include-removable` | 이동식 로컬 장치를 검색 대상에 포함합니다. |
+| `--no-default-excludes` | 선택적인 시스템 경로 기본 제외를 해제합니다. |
+| `--config 설정파일.json` | JSON 설정 파일을 불러옵니다. |
+| `--help` | 사용 가능한 옵션을 확인합니다. |
+
+## 구조와 엔진 사용
+
+```text
+storage_scanner/
+  main.py                  CLI 설정 및 GUI 진입점
+  core/
+    models.py              불변 설정·일치 파일·진행·요약 모델
+    scanner.py             GUI/큐 비의존 순회 엔진
+    filters.py             정확한 크기 변환·제외 경계
+    results.py             저장 인터페이스·메모리 트리 인덱스
+    benchmark.py           GUI 없는 측정 진입점
+  platform_fs/
+    paths.py               호스트 경로 및 링크 정책
+    volumes.py             검색 루트·마운트 경계 구성
+    windows.py / linux.py  OS별 볼륨·제외 정책
+    metrics.py             OS별 프로세스 최대 메모리
+  gui/
+    app.py                 Tk 이벤트·주기적 상태 표시
+    controller.py          워커·제한 큐·결과 수집·실행 ID
+    tree_view.py           예산 제한 렌더링·지연 로딩·페이지
+tests/                     표준 unittest 테스트
+benchmarks/                임시 데이터 시나리오 측정
+```
+
+```python
+from storage_scanner.core.scanner import scan
+from storage_scanner.platform_fs.volumes import discover_volumes, make_config
+from threading import Event
+
+stop = Event()
+config = make_config(discover_volumes(), min_size_bytes=100 * 1024 * 1024)
+summary = scan(config,
+               on_batch=lambda matches: print("batch:", len(matches)),
+               on_progress=lambda p: print(p.files_scanned, p.files_matched),
+               should_cancel=stop.is_set)
+print(summary)
+```
+
+엔진은 단일 워커에서 `os.scandir()`와 명시적 스택을 사용합니다. 일반 파일에만 `stat(follow_symlinks=False)`를 호출하며 내용이나 해시는 읽지 않습니다. 일반적인 `OSError`는 횟수를 집계하고 계속 진행합니다. 디렉터리 경계 및 기본 128개 엔트리마다 취소 여부를 확인합니다. 콜백 예외는 호출자 측 오류로 전파합니다.
+
+결과는 기본 512개 배치로 전달하고, 기본 0.25초가 지나면 다음 확인 지점에서 부분 배치도 전달합니다. 완료·취소 시 남은 결과도 전달합니다. 진행 알림은 기본 0.2초 간격입니다. 대기 중인 OS 호출 자체를 강제로 중단하지는 않습니다.
+
+GUI controller는 최대 8개 배치의 큐와 별도 결과 수집 스레드를 사용합니다. GUI가 처리하지 못하는 동안에도 수집하며, 큐가 가득 차면 워커에 역압을 적용합니다. 진행 상태는 최신 값만 유지합니다. 재시작 시 이전 실행을 취소하고 단일 순회 잠금이 해제된 뒤 새 순회를 시작합니다. 실행별 저장소와 ID로 이전 결과의 혼입을 방지하며 워커에서 Tkinter를 호출하지 않습니다.
+
+메모리 저장소는 일치 파일과 관련 폴더 수에 비례하는 **O(matches + ancestor folders)** 메모리를 사용합니다. 모든 결과를 저장하므로 메모리 사용 자체에 고정 상한은 없습니다. 전체 파일 목록을 미리 구축하지 않으며, 큐와 화면 표시량을 제한합니다. 결과 수가 메모리 용량을 초과하는 규모에서는 `ResultStore` 인터페이스에 SQLite 등의 저장소를 구현해 controller 생성부를 교체해야 합니다. v1 스캔에 DB 쓰기를 강제하지 않습니다.
+
+GUI는 700ms마다 상태를 읽고 변경된 폴더만 조회합니다. 갱신당 최대 150개 항목, 약 12ms의 렌더링 예산을 적용하고 폴더마다 200개씩 페이지 처리합니다. 12ms는 하드 실시간 보장이 아닙니다. 아주 느린 개별 Tk/OS 호출은 이 예산을 초과할 수 있습니다. 파일 변경 경쟁으로 크기와 상태가 바뀔 수 있으며, 결과는 각 파일의 메타데이터를 조회한 시점 기준입니다. 하드링크는 경로별로 집계하고 희소·압축 파일의 실제 디스크 점유량은 계산하지 않습니다.
+
+## 테스트와 벤치마크
+
+```powershell
+python -m unittest discover -s tests -v
+
+# 순회 엔진 기준: 결과는 배치 전달 후 폐기
+python -m storage_scanner.core.benchmark "C:\Data" --min-size-mib 100
+
+# 결과 저장 비용 포함
+python -m storage_scanner.core.benchmark "C:\Data" --min-size-mib 100 --store
+
+# Python 할당 최대 메모리 추가 측정 (추적 비용이 시간에 포함됨)
+python -m storage_scanner.core.benchmark "C:\Data" --store --track-python-memory
+
+# 소유한 임시 fixture만 생성·정리. GUI 창은 자동으로 열고 닫음
+python -m benchmarks.run_scenarios --entries 3000 --gui --output benchmarks/local-results.json
+```
+
+벤치마크는 JSON으로 파일 수/초, 전체 시간, 일치 수, 오류 수, 취소 여부, 프로세스 최대 resident/working-set 메모리 등을 출력합니다. Ctrl+C는 정상 취소하고 요약을 출력합니다. 최대 프로세스 메모리는 인터프리터·볼륨 검색 등을 포함한 **프로세스 생애 최대값**입니다. Python 메모리 추적 실행의 시간은 비추적 실행과 직접 비교하지 마세요.
+
+시나리오 도구는 빈 디렉터리 다수 / 작은 파일 다수·일치 없음 / 일치 파일 다수를 구분하고 각 모드를 **새 프로세스**에서 실행합니다. 엔진 단독, 저장 포함, 선택적 GUI 실행을 비교합니다. GUI는 일치 루트만 펼쳐 정상 페이지 제한을 적용하고, 수집 포함 엔진 시간·700ms 타이머 대기 포함 전체 시간·실제 트리 갱신 시간·10ms heartbeat의 최대 간격을 기록합니다. 전체 GUI 시간에서 엔진 시간을 뺀 값을 순수 렌더링 비용으로 해석하면 안 됩니다. fixture 생성 시간은 스캔 시간에서 제외됩니다. 파일 내용은 1바이트 길이의 테스트 파일로 만들며 대용량 데이터 읽기 성능 시험이 아닙니다.
+
+임시 폴더가 tmpfs 등 제외된 파일시스템에 있으면 `--fixture-parent .`로 프로젝트의 로컬 볼륨에 fixture를 만드세요. 예: `python3 -m benchmarks.run_scenarios --entries 3000 --gui --fixture-parent .`. 이 경우에도 새로 생성한 임시 하위 폴더만 정리합니다.
+
+OS 캐시 상태, 디스크 종류, 보안 소프트웨어, 경로 구조가 속도에 영향을 줍니다. 최소 반복 3회 이상으로 변동을 확인하고, SSD/HDD와 OS별로 따로 기록하세요. 확인하지 않은 저장매체 종류는 `unverified`로 기록합니다. 속도 배수나 목표 완료 시간은 약속하지 않습니다. 현재 환경의 측정과 검증 범위는 [benchmarks/VALIDATION.md](benchmarks/VALIDATION.md)에 기록합니다.
+
+자동 테스트는 크기 경계·정확한 바이트 변환, 한글/공백/특수문자, 중첩/깊은/빈 폴더, 중복 루트/마운트, OS별 경계·타입·bind/subvolume 정책, 삭제 경쟁·접근 실패, 배치·취소·재시작·늦은 결과 격리, 수집 실패, 2만 개 결과의 저장·지연 표시를 검증합니다. 심볼릭 링크 생성 권한이나 Tk 디스플레이가 없으면 해당 테스트만 건너뜁니다. Linux 실기기, 실제 네트워크/이동식 장치, 다양한 디스크에서의 수동 확인은 별도입니다.

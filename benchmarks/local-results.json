@@ -1,0 +1,230 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.15",
+  "entries": 3000,
+  "storage_medium": "unverified",
+  "scenarios": {
+    "empty_directories": {
+      "engine": {
+        "files_scanned": 0,
+        "directories_scanned": 3001,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.24299799999971583,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\empty_directories"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 1,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": false,
+        "files_per_second": 0.0,
+        "peak_process_memory_bytes": 26587136
+      },
+      "store": {
+        "files_scanned": 0,
+        "directories_scanned": 3001,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.2996160000002419,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\empty_directories"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 1,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": true,
+        "files_per_second": 0.0,
+        "peak_process_memory_bytes": 26599424
+      },
+      "gui": {
+        "files_scanned": 0,
+        "directories_scanned": 3001,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.2849673000000621,
+        "cancelled": false,
+        "gui_wall_seconds": 0.6045678000000407,
+        "tree_refresh_seconds": 6.089999988034833e-05,
+        "tree_refresh_count": 1,
+        "max_heartbeat_gap_seconds": 0.029911399999946298,
+        "stored_matches": 0,
+        "rendered_nodes": 0,
+        "peak_process_memory_bytes": 47902720,
+        "error": null
+      }
+    },
+    "many_files_no_matches": {
+      "engine": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.010709199999837438,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_files_no_matches"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 2,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": false,
+        "files_per_second": 280132.96978724265,
+        "peak_process_memory_bytes": 25964544
+      },
+      "store": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.008554000000003725,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_files_no_matches"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 2,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": true,
+        "files_per_second": 350713.11667041073,
+        "peak_process_memory_bytes": 26304512
+      },
+      "gui": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 0,
+        "errors": 0,
+        "elapsed_seconds": 0.011634800000138057,
+        "cancelled": false,
+        "gui_wall_seconds": 0.6075755000001664,
+        "tree_refresh_seconds": 2.570000015111873e-05,
+        "tree_refresh_count": 1,
+        "max_heartbeat_gap_seconds": 0.02635920000011538,
+        "stored_matches": 0,
+        "rendered_nodes": 0,
+        "peak_process_memory_bytes": 47562752,
+        "error": null
+      }
+    },
+    "many_matches": {
+      "engine": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 3000,
+        "errors": 0,
+        "elapsed_seconds": 0.022835700000541692,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_matches"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 1,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": false,
+        "files_per_second": 131373.2445219037,
+        "peak_process_memory_bytes": 26406912
+      },
+      "store": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 3000,
+        "errors": 0,
+        "elapsed_seconds": 0.04739119999976538,
+        "cancelled": false,
+        "roots": [
+          "c:\\users\\cjfty\\appdata\\local\\temp\\storage-scanner-benchmark-pg24c8k5\\many_matches"
+        ],
+        "excluded_paths": [
+          "C:\\WINDOWS",
+          "c:\\System Volume Information",
+          "c:\\$Recycle.Bin",
+          "c:\\Recovery",
+          "c:\\$WinREAgent",
+          "g:\\System Volume Information",
+          "g:\\$Recycle.Bin",
+          "g:\\Recovery",
+          "g:\\$WinREAgent"
+        ],
+        "min_size_bytes": 1,
+        "platform": "Windows-11-10.0.26300-SP0",
+        "python": "3.13.15",
+        "store_enabled": true,
+        "files_per_second": 63302.89167640516,
+        "peak_process_memory_bytes": 27201536
+      },
+      "gui": {
+        "files_scanned": 3000,
+        "directories_scanned": 1,
+        "files_matched": 3000,
+        "errors": 0,
+        "elapsed_seconds": 0.07341830000041227,
+        "cancelled": false,
+        "gui_wall_seconds": 1.9236746999995376,
+        "tree_refresh_seconds": 0.003349499999785621,
+        "tree_refresh_count": 3,
+        "max_heartbeat_gap_seconds": 0.09387419999984559,
+        "stored_matches": 3000,
+        "rendered_nodes": 201,
+        "peak_process_memory_bytes": 48750592,
+        "error": null
+      }
+    }
+  }
+}
