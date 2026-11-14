@@ -2,11 +2,31 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from storage_scanner.options import argument_parser, load_settings
+from storage_scanner.options import argument_parser, load_settings, configured_scope, configured_scan
+from storage_scanner.platform_fs.volumes import Discovery, ScanScope, make_config
 
 
 class OptionTests(unittest.TestCase):
+    def test_scope_has_no_file_model_and_preserves_policy(self):
+        root = str(Path.cwd())
+        mandatory = str(Path(root) / "mandatory")
+        default = str(Path(root) / "default")
+        extra = str(Path(root) / "extra")
+        discovery = Discovery((root,), (root,), (default,), (mandatory,))
+        settings = load_settings(argument_parser("test").parse_args([]))
+        settings.update(roots=(root,), extra_exclusions=(mandatory, extra), min_size_bytes=7)
+        with patch("storage_scanner.options.discover_volumes", return_value=discovery):
+            with patch("storage_scanner.core.models.ScanConfig", side_effect=AssertionError("File model")):
+                _, scope = configured_scope(settings)
+            self.assertIsInstance(scope, ScanScope)
+            self.assertEqual(scope.excluded_paths, (mandatory, default, extra))
+            _, config = configured_scan(settings)
+        self.assertEqual(config, make_config(discovery, roots=(root,), min_size_bytes=7,
+                                             excluded_paths=(default, mandatory, extra)))
+        self.assertEqual(config.min_size_bytes, 7)
+
     def test_default_and_custom_gui_period_keep_small_minimum(self):
         settings = load_settings(argument_parser("test").parse_args([]))
         self.assertEqual(settings["update_ms"], 1000)

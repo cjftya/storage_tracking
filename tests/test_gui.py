@@ -471,7 +471,7 @@ class GuiTests(unittest.TestCase):
         self.assertFalse(self.errors)
 
     def test_refresh_keeps_selected_scope_and_edited_exclusions(self):
-        from storage_scanner.gui.app import configured_scan
+        from storage_scanner.gui.app import configured_scope
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
             app = self.make_app(directory)
             defaults = {path_key(p) for p in (*app.discovery.default_exclusions,
@@ -486,7 +486,7 @@ class GuiTests(unittest.TestCase):
             app.excludes_text.insert("1.0", edited)
             expected_scope = app.roots_list.get(0, "end")
             self.assertEqual(expected_scope, (path_key(str(extra)),))
-            with patch("storage_scanner.gui.app.configured_scan", wraps=configured_scan) as discover:
+            with patch("storage_scanner.gui.app.configured_scope", wraps=configured_scope) as discover:
                 app.discover()
                 self.wait_until(lambda: app._discover_timer is None)
             self.assertTrue(discover.call_args.args[0]["include_removable"])
@@ -508,7 +508,7 @@ class GuiTests(unittest.TestCase):
                 Path(path).mkdir()
             (Path(usb) / "match.bin").write_bytes(b"test")
             discovery = Discovery((local, usb), (local, usb, network), ())
-            with patch("storage_scanner.gui.app.configured_scan",
+            with patch("storage_scanner.gui.app.configured_scope",
                        return_value=(discovery, make_config(discovery, roots=(local,)))) as discover:
                 app = self.make_app(local)
             self.assertTrue(discover.call_args.args[0]["include_removable"])
@@ -553,7 +553,11 @@ class GuiTests(unittest.TestCase):
 
             def visible(parent=""):
                 for item in self.view.tree.get_children(parent):
-                    if self.view.tree.bbox(item):
+                    bounds = self.view.tree.bbox(item)
+                    # Linux Tk can return a bbox for an extra row entirely
+                    # below the viewport. Only painted rows must be striped.
+                    if (bounds and bounds[1] < self.view.tree.winfo_height()
+                            and bounds[1] + bounds[3] > 0):
                         rows.append(item)
                     if self.view.tree.item(item, "open"):
                         visible(item)
@@ -562,7 +566,10 @@ class GuiTests(unittest.TestCase):
             self.assertGreater(len(rows), 2)
             tags = [next(tag for tag in self.view.tree.item(item, "tags")
                          if tag in self.view.ROW_TAGS) for item in rows]
-            self.assertTrue(all(a != b for a, b in zip(tags, tags[1:])), list(zip(rows, tags)))
+            self.assertTrue(all(a != b for a, b in zip(tags, tags[1:])), {
+                "height": self.view.tree.winfo_height(),
+                "rows": [(item, tag, self.view.tree.bbox(item)) for item, tag in zip(rows, tags)],
+            })
             return rows
 
         assert_striped()

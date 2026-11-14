@@ -6,21 +6,15 @@ from tkinter import Menu, ttk
 from storage_scanner.core.results import ResultStore
 
 
-def display_size(size):
-    if size < 1024:
-        return f"{size:,} B"
-    for unit in ("KiB", "MiB", "GiB", "TiB", "PiB"):
-        size /= 1024
-        if size < 1024 or unit == "PiB":
-            return f"{size:,.2f} {unit}"
+from storage_scanner.gui.formatting import display_size, ROW_COLORS, ROW_TAGS
 
 
 class ResultTree(ttk.Frame):
     PAGE_SIZE = 200
     INSERT_BUDGET = 150
     TIME_BUDGET = 0.012
-    ROW_COLORS = ("#f5f5f5", "#e8e8e8")
-    ROW_TAGS = ("row_light", "row_dark")
+    ROW_COLORS = ROW_COLORS
+    ROW_TAGS = ROW_TAGS
 
     def __init__(self, parent, on_open_folder=None):
         super().__init__(parent)

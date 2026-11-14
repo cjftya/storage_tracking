@@ -1,4 +1,4 @@
-"""Headless baseline; use --store to separately measure result indexing cost."""
+"""Folder-only benchmark; use --store to include RAM aggregation cost."""
 from dataclasses import asdict
 import json
 import platform
@@ -10,7 +10,7 @@ import tracemalloc
 from storage_scanner.folder.results import FolderResultStore
 from storage_scanner.folder.scanner import scan
 from storage_scanner.folder.models import FolderConfig
-from storage_scanner.options import argument_parser, configured_scan, load_settings
+from storage_scanner.options import argument_parser, configured_scope, load_settings
 from storage_scanner.platform_fs.metrics import peak_memory_bytes
 
 
@@ -21,10 +21,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         settings = load_settings(args)
-        _, config = configured_scan(settings)
+        _, scope = configured_scope(settings)
+        config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths)
         stop = Event()
         previous = signal.signal(signal.SIGINT, lambda signum, frame: stop.set())
-        config = FolderConfig(config.roots, config.excluded_paths, config.boundary_paths)
         store = FolderResultStore(config.roots) if args.store else None
         if args.track_python_memory:
             tracemalloc.start()

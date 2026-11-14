@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import os
 import sys
 
-from storage_scanner.core.models import ScanConfig
 from storage_scanner.platform_fs.paths import contains_path, path_key
 
 
@@ -12,6 +11,14 @@ class Discovery:
     boundary_paths: tuple[str, ...]
     default_exclusions: tuple[str, ...]
     mandatory_exclusions: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ScanScope:
+    """Resolved platform policy, independent of either scanner's configuration."""
+    roots: tuple[str, ...]
+    excluded_paths: tuple[str, ...]
+    boundary_paths: tuple[str, ...]
 
 
 def validate_roots(discovery: Discovery, roots):
@@ -40,9 +47,16 @@ def discover_volumes(include_removable: bool = False) -> Discovery:
     raise RuntimeError("Only Windows and Linux are supported")
 
 
-def make_config(discovery: Discovery, *, roots=None, min_size_bytes=100 * 1024 * 1024,
-                excluded_paths=None) -> ScanConfig:
+def resolve_scope(discovery: Discovery, *, roots=None, excluded_paths=None) -> ScanScope:
     exclusions = discovery.default_exclusions if excluded_paths is None else tuple(excluded_paths)
-    return ScanConfig(tuple(discovery.roots if roots is None else roots), min_size_bytes,
-                      tuple(dict.fromkeys((*discovery.mandatory_exclusions, *exclusions))),
-                      discovery.boundary_paths)
+    return ScanScope(tuple(discovery.roots if roots is None else roots),
+                     tuple(dict.fromkeys((*discovery.mandatory_exclusions, *exclusions))),
+                     discovery.boundary_paths)
+
+
+def make_config(discovery: Discovery, *, roots=None, min_size_bytes=100 * 1024 * 1024,
+                excluded_paths=None):
+    """Compatibility factory for the public file-scanner API."""
+    from storage_scanner.core.models import ScanConfig
+    scope = resolve_scope(discovery, roots=roots, excluded_paths=excluded_paths)
+    return ScanConfig(scope.roots, min_size_bytes, scope.excluded_paths, scope.boundary_paths)

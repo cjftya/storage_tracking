@@ -1,0 +1,32 @@
+name: Linux tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Install system Python, Tk and virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes python3 python3-tk xvfb xauth
+      - name: Require a working Tk display
+        run: |
+          /usr/bin/python3 --version
+          xvfb-run -a /usr/bin/python3 -c 'import tkinter as tk; root = tk.Tk(); print("Tk", root.tk.call("info", "patchlevel")); root.destroy()'
+      - name: Run full suite with real Linux Tk widgets
+        run: xvfb-run -a /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Compile Python sources
+        run: /usr/bin/python3 -m compileall -q storage_scanner tests benchmarks
