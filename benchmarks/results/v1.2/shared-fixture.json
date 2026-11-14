@@ -1,0 +1,2437 @@
+{
+  "baseline_ref": "35cdbfc60f0979a7361aef44f901aebe0599f719",
+  "repeat": 7,
+  "files": 10000,
+  "scenarios": {
+    "empty_directories": {
+      "medians_seconds": {
+        "baseline": {
+          "engine": 0.2472946000052616,
+          "store": 0.2597899999964284
+        },
+        "current": {
+          "engine": 0.2515389000036521,
+          "store": 0.26218810000864323
+        }
+      },
+      "samples": {
+        "baseline": {
+          "engine": [
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2465959999972256,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26996736
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24527780000062194,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26542080
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2446561999968253,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26546176
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.27096440001332667,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26624000
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2640756000037072,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26529792
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2657737999979872,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26595328
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2472946000052616,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26619904
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.25142369999957737,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26644480
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24697380000725389,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26681344
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2680623999913223,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26337280
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.3087253999983659,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26501120
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2597899999964284,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26599424
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.26820049999514595,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26632192
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.25165210000704974,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26566656
+            }
+          ]
+        },
+        "current": {
+          "engine": [
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.3002995999995619,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26775552
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24847910000244156,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26419200
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2515389000036521,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26308608
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.26912719999381807,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26374144
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24869439999747556,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26525696
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24866800000017975,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26550272
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.25573820000863634,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26345472
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2819854999979725,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26509312
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24952939999639057,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26509312
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.2669817999994848,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26476544
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.3013197999971453,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26411008
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.24747450000722893,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26566656
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.26218810000864323,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26488832
+            },
+            {
+              "files_scanned": 0,
+              "directories_scanned": 3001,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.26037669999641366,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\empty_directories"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 0.0,
+              "peak_process_memory_bytes": 26611712
+            }
+          ]
+        }
+      }
+    },
+    "no_matches": {
+      "medians_seconds": {
+        "baseline": {
+          "engine": 0.022797800003900193,
+          "store": 0.022187700000358745
+        },
+        "current": {
+          "engine": 0.02479160000802949,
+          "store": 0.02491110000119079
+        }
+      },
+      "samples": {
+        "baseline": {
+          "engine": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.035453100004815497,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 282062.781495602,
+              "peak_process_memory_bytes": 26267648
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022325799989630468,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 447912.28106695577,
+              "peak_process_memory_bytes": 25894912
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.021530300000449643,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 464461.71208906325,
+              "peak_process_memory_bytes": 26333184
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022797800003900193,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 438638.8159510665,
+              "peak_process_memory_bytes": 26271744
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.026593300004606135,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 376034.56503209204,
+              "peak_process_memory_bytes": 26337280
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.026110499995411374,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 382987.68701317045,
+              "peak_process_memory_bytes": 26288128
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022632599997450598,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 441840.53096535214,
+              "peak_process_memory_bytes": 26497024
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.0314455000043381,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 318010.526104544,
+              "peak_process_memory_bytes": 26316800
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022187700000358745,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 450700.1626954715,
+              "peak_process_memory_bytes": 26427392
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02751130000979174,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 363487.00339281786,
+              "peak_process_memory_bytes": 26222592
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02169740000681486,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 460884.71415280795,
+              "peak_process_memory_bytes": 26521600
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.021622100000968203,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 462489.7673931864,
+              "peak_process_memory_bytes": 26226688
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.025642799999332055,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 389973.0138775984,
+              "peak_process_memory_bytes": 26312704
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022091299993917346,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 452666.88708918967,
+              "peak_process_memory_bytes": 26468352
+            }
+          ]
+        },
+        "current": {
+          "engine": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02776810000068508,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 360125.46770406637,
+              "peak_process_memory_bytes": 25919488
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.025751399996806867,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 388328.4016107856,
+              "peak_process_memory_bytes": 25972736
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.025203299999702722,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 396773.43840361986,
+              "peak_process_memory_bytes": 26337280
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02479160000802949,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 403362.4290792529,
+              "peak_process_memory_bytes": 25972736
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022211200004676357,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 450223.3106673478,
+              "peak_process_memory_bytes": 25899008
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.020902300006127916,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 478416.2507029516,
+              "peak_process_memory_bytes": 25923584
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.023469899999327026,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 426077.65692596644,
+              "peak_process_memory_bytes": 25899008
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.026953900000080466,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 371003.82504832867,
+              "peak_process_memory_bytes": 26431488
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02491110000119079,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 401427.4760858406,
+              "peak_process_memory_bytes": 26443776
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.03056769999966491,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 327142.7029220263,
+              "peak_process_memory_bytes": 26296320
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.023941699997521937,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 417681.2841625716,
+              "peak_process_memory_bytes": 26308608
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.02278130000922829,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 438956.5124004856,
+              "peak_process_memory_bytes": 26517504
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.027936200000112876,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 357958.4911319218,
+              "peak_process_memory_bytes": 26259456
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 0,
+              "errors": 0,
+              "elapsed_seconds": 0.022783399996114895,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\no_matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 2,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 438916.05299056484,
+              "peak_process_memory_bytes": 26255360
+            }
+          ]
+        }
+      }
+    },
+    "matches": {
+      "medians_seconds": {
+        "baseline": {
+          "engine": 0.05283670000790153,
+          "store": 0.1285494000039762
+        },
+        "current": {
+          "engine": 0.05278080000425689,
+          "store": 0.14398209999490064
+        }
+      },
+      "samples": {
+        "baseline": {
+          "engine": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.05283670000790153,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 189262.38766812722,
+              "peak_process_memory_bytes": 26488832
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.0494446000084281,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 202246.55469546615,
+              "peak_process_memory_bytes": 26357760
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.04505260000587441,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 221962.7723748707,
+              "peak_process_memory_bytes": 26513408
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.053928900000755675,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 185429.33380543411,
+              "peak_process_memory_bytes": 26202112
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.059924200002569705,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 166877.48855339203,
+              "peak_process_memory_bytes": 26525696
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.0755695999978343,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 132328.34367638023,
+              "peak_process_memory_bytes": 26411008
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.05133919999934733,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 194782.93390093982,
+              "peak_process_memory_bytes": 26378240
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.13622479999321513,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 73408.07254257715,
+              "peak_process_memory_bytes": 28811264
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.11689989999285899,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 85543.27249733203,
+              "peak_process_memory_bytes": 28782592
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.11816870000620838,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 84624.77796129277,
+              "peak_process_memory_bytes": 29032448
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.12352729999111034,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 80953.76488209207,
+              "peak_process_memory_bytes": 28844032
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.22455949999857694,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 44531.62747540572,
+              "peak_process_memory_bytes": 28954624
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.19382390000100713,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 51593.2245711083,
+              "peak_process_memory_bytes": 29085696
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.1285494000039762,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 77791.10598486409,
+              "peak_process_memory_bytes": 28913664
+            }
+          ]
+        },
+        "current": {
+          "engine": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.05278080000425689,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 189462.83495501164,
+              "peak_process_memory_bytes": 25931776
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.07229540000844281,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 138321.386960058,
+              "peak_process_memory_bytes": 26083328
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.04322469999897294,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 231349.20543665104,
+              "peak_process_memory_bytes": 26431488
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.04623829999763984,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 216270.92692660485,
+              "peak_process_memory_bytes": 26357760
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.07159540000429843,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 139673.77791589434,
+              "peak_process_memory_bytes": 26406912
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.14443859999300912,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 69233.57053089689,
+              "peak_process_memory_bytes": 26439680
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.04767099999298807,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": false,
+              "files_per_second": 209771.13971745715,
+              "peak_process_memory_bytes": 26071040
+            }
+          ],
+          "store": [
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.1409921000013128,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 70925.95968076856,
+              "peak_process_memory_bytes": 29134848
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.14398209999490064,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 69453.07785033116,
+              "peak_process_memory_bytes": 29179904
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.11896770000748802,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 84056.4287564657,
+              "peak_process_memory_bytes": 28913664
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.1430644000065513,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 69898.59112079647,
+              "peak_process_memory_bytes": 28684288
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.20141080000030342,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 49649.770518685866,
+              "peak_process_memory_bytes": 29011968
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.2583007999928668,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 38714.552956383246,
+              "peak_process_memory_bytes": 29040640
+            },
+            {
+              "files_scanned": 10000,
+              "directories_scanned": 1,
+              "files_matched": 10000,
+              "errors": 0,
+              "elapsed_seconds": 0.14843699999619275,
+              "cancelled": false,
+              "roots": [
+                "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-comparison-tp60byf6\\matches"
+              ],
+              "excluded_paths": [
+                "C:\\WINDOWS",
+                "c:\\System Volume Information",
+                "c:\\$Recycle.Bin",
+                "c:\\Recovery",
+                "c:\\$WinREAgent",
+                "g:\\System Volume Information",
+                "g:\\$Recycle.Bin",
+                "g:\\Recovery",
+                "g:\\$WinREAgent"
+              ],
+              "min_size_bytes": 0,
+              "platform": "Windows-11-10.0.26300-SP0",
+              "python": "3.13.15",
+              "store_enabled": true,
+              "files_per_second": 67368.64798033165,
+              "peak_process_memory_bytes": 28942336
+            }
+          ]
+        }
+      }
+    }
+  }
+}

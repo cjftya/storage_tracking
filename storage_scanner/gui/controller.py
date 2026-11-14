@@ -37,10 +37,10 @@ class RunSnapshot:
 
 
 class ScanController:
-    def __init__(self):
+    def __init__(self, scan_lock=None):
         self._run = None
         self._next_id = 0
-        self._scan_lock = Lock()
+        self._scan_lock = scan_lock if scan_lock is not None else Lock()
         self._closed = False
 
     def start(self, config: ScanConfig) -> RunSnapshot:

@@ -42,12 +42,14 @@ class GuiTests(unittest.TestCase):
         # test's worker allocation can trigger cyclic garbage collection.
         gc.collect()
 
-    def make_app(self, directory=None, minimum=0, update_ms=50):
+    def make_app(self, directory=None, minimum=0, update_ms=50, scan_mode="file"):
         from storage_scanner.gui.app import ScannerApp
         if self.view.winfo_exists():
             self.view.destroy()
-        settings = {"roots": (directory,) if directory else None, "min_size_bytes": minimum, "extra_exclusions": (),
+        settings = {"scan_mode": scan_mode, "roots": (directory,) if directory else None, "min_size_bytes": minimum, "extra_exclusions": (),
                     "include_removable": False, "use_default_exclusions": True, "update_ms": update_ms}
+        if scan_mode is None:
+            settings.pop("scan_mode")
         app = ScannerApp(self.root, settings)
 
         def cleanup():
