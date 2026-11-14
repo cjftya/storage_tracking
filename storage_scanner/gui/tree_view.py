@@ -19,18 +19,23 @@ class ResultTree(ttk.Frame):
     PAGE_SIZE = 200
     INSERT_BUDGET = 150
     TIME_BUDGET = 0.012
+    ROW_COLORS = ("#f5f5f5", "#e8e8e8")
+    ROW_TAGS = ("row_light", "row_dark")
 
     def __init__(self, parent, on_open_folder=None):
         super().__init__(parent)
         self.on_open_folder = on_open_folder
         self._render_timer = None
         self._cleanup_timer = None
+        self._stripe_timer = None
         self._generation = 0
         self._retired = deque()
         self._paths = {}
         self._context_path = None
         self.menu = Menu(self, tearoff=False)
-        self.menu.add_command(label="열기", command=self._open_context_folder)
+        self.menu.add_command(label="Open folder", command=self._open_context_folder)
+        ttk.Style(self).configure("Results.Treeview", rowheight=24, foreground="#202020",
+                                  background=self.ROW_COLORS[0], fieldbackground=self.ROW_COLORS[0])
         self.vertical = ttk.Scrollbar(self, orient="vertical")
         self.horizontal = ttk.Scrollbar(self, orient="horizontal")
         self.vertical.grid(row=0, column=1, sticky="ns")
@@ -41,18 +46,25 @@ class ResultTree(ttk.Frame):
         self.reset(None)
 
     def _create_tree(self):
-        self.tree = ttk.Treeview(self, columns=("size", "bytes"), selectmode="browse")
-        self.tree.heading("#0", text="Path / file")
-        self.tree.heading("size", text="용량 (검색 결과 합계)")
+        self.tree = ttk.Treeview(self, columns=("size", "bytes"), selectmode="browse", style="Results.Treeview")
+        self.tree.heading("#0", text="Name / Path")
+        self.tree.heading("size", text="Matched size")
         self.tree.heading("bytes", text="Bytes")
         self.tree.column("#0", width=580, minwidth=200)
         self.tree.column("size", width=180, anchor="e", stretch=False)
         self.tree.column("bytes", width=150, anchor="e", stretch=False)
         self.vertical.configure(command=self.tree.yview)
         self.horizontal.configure(command=self.tree.xview)
-        self.tree.configure(yscrollcommand=self.vertical.set, xscrollcommand=self.horizontal.set)
+        generation = self._generation
+        self.tree.configure(yscrollcommand=lambda first, last: self._on_scroll(generation, first, last),
+                            xscrollcommand=self.horizontal.set)
+        for tag, color in zip(self.ROW_TAGS, self.ROW_COLORS):
+            self.tree.tag_configure(tag, background=color)
         self.tree.grid(row=0, column=0, sticky="nsew")
         self.tree.bind("<<TreeviewOpen>>", self._open)
+        self.tree.bind("<<TreeviewClose>>", self._schedule_striping)
+        self.tree.bind("<Configure>", self._schedule_striping)
+        self.tree.bind("<Map>", self._schedule_striping)
         self.tree.bind("<Double-1>", self._more)
         self.tree.bind("<Return>", self._more)
         self.tree.bind("<Button-3>", self._show_context_menu)
@@ -64,6 +76,9 @@ class ResultTree(ttk.Frame):
         if self._render_timer is not None:
             self.after_cancel(self._render_timer)
             self._render_timer = None
+        if self._stripe_timer is not None:
+            self.after_cancel(self._stripe_timer)
+            self._stripe_timer = None
         self.menu.unpost()
         self._context_path = None
         self.store = store
@@ -131,7 +146,52 @@ class ResultTree(ttk.Frame):
         if self._cleanup_timer is not None:
             self.after_cancel(self._cleanup_timer)
             self._cleanup_timer = None
+        if self._stripe_timer is not None:
+            self.after_cancel(self._stripe_timer)
+            self._stripe_timer = None
         super().destroy()
+
+    def _on_scroll(self, generation, first, last):
+        if generation != self._generation:
+            return
+        self.vertical.set(first, last)
+        self._schedule_striping()
+
+    def _schedule_striping(self, event=None):
+        if event is not None and event.widget is not self.tree:
+            return
+        if self._stripe_timer is None:
+            self._stripe_timer = self.after_idle(self._stripe_visible_rows, self._generation)
+
+    def _stripe_visible_rows(self, generation):
+        if generation != self._generation:
+            return
+        self._stripe_timer = None
+        if not self._paths or not self.tree.winfo_ismapped():
+            return
+        # Walk pixels in the viewport, jumping by actual row bounds. Never
+        # traverse collapsed children or all previously loaded pages.
+        y, height = 0, self.tree.winfo_height()
+        parity = None
+        while y < height:
+            item = self.tree.identify_row(y)
+            if not item:
+                if parity is not None:
+                    break
+                y += 1  # Skip the heading.
+                continue
+            bounds = self.tree.bbox(item)
+            if not bounds:
+                break
+            tags = self.tree.item(item, "tags")
+            if parity is None:
+                # Keep the first visible row's color stable during scrolling.
+                parity = int(self.ROW_TAGS[1] in tags)
+            new_tags = tuple(tag for tag in tags if tag not in self.ROW_TAGS) + (self.ROW_TAGS[parity],)
+            if tags != new_tags:
+                self.tree.item(item, tags=new_tags)
+            parity = 1 - parity
+            y = max(y + 1, bounds[1] + bounds[3] + 1)
 
     def _show_context_menu(self, event):
         if getattr(event, "widget", self.tree) is not self.tree:
@@ -176,6 +236,7 @@ class ResultTree(ttk.Frame):
         item = self.tree.focus()
         if item in self._paths:
             self._enqueue(self._paths[item])
+            self._schedule_striping()
 
     def _more(self, event=None):
         if event is not None and getattr(event, "widget", self.tree) is not self.tree:
@@ -237,14 +298,15 @@ class ResultTree(ttk.Frame):
                     if node.path in self._items:
                         continue
                     values = (display_size(node.size_bytes), f"{node.size_bytes:,}")
-                    item = self.tree.insert(parent, "end", text=node.name, values=values)
+                    item = self.tree.insert(parent, "end", text=node.name, values=values,
+                                            tags=(self.ROW_TAGS[(self._offsets[path] - 1) % 2],))
                     self._items[node.path] = item
                     self._paths[item] = node.path
                     if node.is_directory:
                         self._directories.add(node.path)
                         self._offsets[node.path] = 0
                         self._limits[node.path] = self.PAGE_SIZE
-                        self.tree.insert(item, "end", iid=item + ":placeholder", text="Expand to load matches")
+                        self.tree.insert(item, "end", iid=item + ":placeholder", text="Expand to load")
                     inserted += 1
             offset = self._offsets[path]
             if offset < min(total, limit):
@@ -253,6 +315,8 @@ class ResultTree(ttk.Frame):
                 more_id = parent + ":more"
                 if not self.tree.exists(more_id):
                     self.tree.insert(parent, "end", iid=more_id,
-                                     text="Load next 200… (double-click or Enter)")
+                                     text="Load next 200…")
                     self._more_items[more_id] = path
+        if inserted:
+            self._schedule_striping()
         return inserted

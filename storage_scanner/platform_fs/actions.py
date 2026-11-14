@@ -7,7 +7,7 @@ import sys
 def open_folder(path: str) -> None:
     path = os.path.abspath(path)
     if not os.path.isdir(path):
-        raise NotADirectoryError(f"폴더가 없거나 접근할 수 없습니다: {path}")
+        raise NotADirectoryError(f"Folder unavailable: {path}")
     if os.name == "nt":
         os.startfile(path, "open")
     elif sys.platform.startswith("linux"):

@@ -42,11 +42,11 @@ class GuiTests(unittest.TestCase):
         # test's worker allocation can trigger cyclic garbage collection.
         gc.collect()
 
-    def make_app(self, directory, minimum=0, update_ms=50):
+    def make_app(self, directory=None, minimum=0, update_ms=50):
         from storage_scanner.gui.app import ScannerApp
         if self.view.winfo_exists():
             self.view.destroy()
-        settings = {"roots": (directory,), "min_size_bytes": minimum, "extra_exclusions": (),
+        settings = {"roots": (directory,) if directory else None, "min_size_bytes": minimum, "extra_exclusions": (),
                     "include_removable": False, "use_default_exclusions": True, "update_ms": update_ms}
         app = ScannerApp(self.root, settings)
 
@@ -123,7 +123,7 @@ class GuiTests(unittest.TestCase):
                 time.sleep(0.002)
             self.assertTrue(result.finished)
             self.assertEqual(result.store.match_count, 1)
-            self.assertIn("matches 1", app.status.get())
+            self.assertIn("Matches 1", app.status.get())
             self.assertEqual(self.showinfo.call_count, 1)
             self.assertFalse(self.errors)
 
@@ -257,7 +257,7 @@ class GuiTests(unittest.TestCase):
             with patch("storage_scanner.gui.app.open_folder", side_effect=OSError("folder disappeared")):
                 app.open_folder(directory)
                 self.wait_until(lambda: self.showerror.called)
-            self.assertEqual(self.showerror.call_args.args[0], "폴더 열기 실패")
+            self.assertEqual(self.showerror.call_args.args[0], "Cannot open folder")
             self.assertIn("folder disappeared", self.showerror.call_args.args[1])
             self.assertFalse(self.errors)
 
@@ -415,6 +415,8 @@ class GuiTests(unittest.TestCase):
         store.add_batch((FileMatch(str(Path(folder) / "new-file"), 123),))
         self.view.reset(store, run_id=2)
         self.view._render_pending(generation)
+        self.view._stripe_visible_rows(generation)
+        self.view._on_scroll(generation, "0", "1")
         self.view._open(SimpleNamespace(widget=old_tree))
         self.assertFalse(self.view.tree.get_children())
         self.assertIsNot(self.view.tree, old_tree)
@@ -438,4 +440,149 @@ class GuiTests(unittest.TestCase):
         self.assertEqual(len(deleted), 20001)
         self.assertEqual(self.view.run_id, 6)
         self.assertEqual(len(self.view._paths), 1)
+        self.assertFalse(self.errors)
+
+    def test_folder_picker_replaces_single_scope_and_clears_it(self):
+        app = self.make_app()
+        self.assertEqual(app.roots_list.size(), 0)
+        self.assertEqual(str(app.start_button["state"]), "disabled")
+        self.assertIsNone(app.controller.snapshot())
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=directory) as picker:
+                app.add_folder()
+                app.add_folder()
+                self.assertTrue(picker.call_args.kwargs["mustexist"])
+                self.assertIs(picker.call_args.kwargs["parent"], self.root)
+            self.assertEqual(app.roots_list.get(0, "end"), (path_key(directory),))
+            self.assertEqual(str(app.start_button["state"]), "normal")
+            replacement = Path(directory) / "replacement"
+            replacement.mkdir()
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=str(replacement)):
+                app.add_folder()
+            self.assertEqual(app.roots_list.get(0, "end"), (path_key(str(replacement)),))
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=""):
+                app.add_folder()
+            self.assertEqual(app.roots_list.get(0, "end"), (path_key(str(replacement)),))
+            app.remove_folders()
+            self.assertEqual(app.roots_list.size(), 0)
+            self.assertEqual(str(app.start_button["state"]), "disabled")
+        self.assertFalse(self.errors)
+
+    def test_refresh_keeps_selected_scope_and_edited_exclusions(self):
+        from storage_scanner.gui.app import configured_scan
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            app = self.make_app(directory)
+            defaults = {path_key(p) for p in (*app.discovery.default_exclusions,
+                                            *app.discovery.mandatory_exclusions)}
+            self.assertTrue(defaults.issubset(set(app._lines(app.excludes_text))))
+            extra = Path(directory) / "another"
+            extra.mkdir()
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=str(extra)):
+                app.add_folder()
+            edited = str(extra / "skip")
+            app.excludes_text.delete("1.0", "end")
+            app.excludes_text.insert("1.0", edited)
+            expected_scope = app.roots_list.get(0, "end")
+            self.assertEqual(expected_scope, (path_key(str(extra)),))
+            with patch("storage_scanner.gui.app.configured_scan", wraps=configured_scan) as discover:
+                app.discover()
+                self.wait_until(lambda: app._discover_timer is None)
+            self.assertTrue(discover.call_args.args[0]["include_removable"])
+            self.assertEqual(app.roots_list.get(0, "end"), expected_scope)
+            self.assertEqual(app.excludes_text.get("1.0", "end-1c"), edited)
+            with patch.object(app.controller, "start", wraps=app.controller.start) as start:
+                app.start()
+            config = start.call_args.args[0]
+            self.assertEqual(config.roots, expected_scope)
+            self.assertEqual(set(config.excluded_paths), {path_key(edited), *app.discovery.mandatory_exclusions})
+            self.wait_until(lambda: app.controller.snapshot().finished)
+        self.assertFalse(self.errors)
+
+    def test_explicit_usb_selection_and_network_rejection(self):
+        from storage_scanner.platform_fs.volumes import Discovery, make_config
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            local, usb, network = (path_key(str(Path(directory) / name)) for name in ("local", "usb", "network"))
+            for path in (local, usb, network):
+                Path(path).mkdir()
+            (Path(usb) / "match.bin").write_bytes(b"test")
+            discovery = Discovery((local, usb), (local, usb, network), ())
+            with patch("storage_scanner.gui.app.configured_scan",
+                       return_value=(discovery, make_config(discovery, roots=(local,)))) as discover:
+                app = self.make_app(local)
+            self.assertTrue(discover.call_args.args[0]["include_removable"])
+            self.assertFalse(hasattr(app, "removable_button"))
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=usb):
+                app.add_folder()
+            self.assertEqual(app.roots_list.get(0, "end"), (usb,))
+            app.start()
+            self.wait_until(lambda: app.controller.snapshot().finished)
+            self.assertEqual(app.controller.snapshot().store.match_count, 1)
+            app.roots_list.delete(0, "end")
+            app.roots_list.insert("end", network)
+            with patch.object(app.controller, "start") as start:
+                app.start()
+                start.assert_not_called()
+            self.assertEqual(self.showerror.call_args.args[0], "Invalid settings")
+            app.roots_list.insert("end", usb)
+            with patch.object(app.controller, "start") as start:
+                app.start()
+                start.assert_not_called()
+            self.assertEqual(self.showerror.call_args.args[1], "Select one folder only.")
+        self.assertFalse(self.errors)
+
+    def test_row_colors_alternate_after_expand_collapse_scroll_and_reset(self):
+        folder = path_key(str(Path.cwd() / "striped"))
+        store = MemoryResultStore((folder,))
+        store.add_batch(tuple(FileMatch(str(Path(folder) / "nested" / f"{i}.bin"), i) for i in range(20))
+                        + tuple(FileMatch(str(Path(folder) / f"{i}.bin"), i) for i in range(250)))
+        self.root.geometry("900x500")
+        self.root.deiconify()
+        self.view.reset(store)
+        self.wait_until(lambda: folder in self.view._items)
+        root_item = self.view._items[folder]
+        self.view.tree.item(root_item, open=True)
+        self.view.tree.focus(root_item)
+        self.view._open()
+        self.wait_until(lambda: self.view._offsets[folder] == 200)
+
+        def assert_striped():
+            self.root.update()
+            rows = []
+
+            def visible(parent=""):
+                for item in self.view.tree.get_children(parent):
+                    if self.view.tree.bbox(item):
+                        rows.append(item)
+                    if self.view.tree.item(item, "open"):
+                        visible(item)
+
+            visible()
+            self.assertGreater(len(rows), 2)
+            tags = [next(tag for tag in self.view.tree.item(item, "tags")
+                         if tag in self.view.ROW_TAGS) for item in rows]
+            self.assertTrue(all(a != b for a, b in zip(tags, tags[1:])), list(zip(rows, tags)))
+            return rows
+
+        assert_striped()
+        nested = self.view._items[str(Path(folder) / "nested")]
+        self.view.tree.item(nested, open=True)
+        self.view.tree.focus(nested)
+        self.view._open()
+        self.wait_until(lambda: self.view._offsets[str(Path(folder) / "nested")] == 20)
+        assert_striped()
+        self.view.tree.item(nested, open=False)
+        self.view.tree.event_generate("<<TreeviewClose>>")
+        assert_striped()
+        self.view.tree.yview_moveto(0.5)
+        rows = assert_striped()
+        self.view.tree.selection_set(rows[1])
+        self.view.tree.yview_scroll(1, "units")
+        assert_striped()
+        self.assertEqual(self.view.tree.selection(), (rows[1],))
+        generation = self.view._generation
+        self.view.reset(store)
+        self.view._stripe_visible_rows(generation)
+        self.wait_until(lambda: folder in self.view._items)
+        self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[0], "background")), "#f5f5f5")
+        self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[1], "background")), "#e8e8e8")
         self.assertFalse(self.errors)
