@@ -562,7 +562,10 @@ class GuiTests(unittest.TestCase):
             self.assertGreater(len(rows), 2)
             tags = [next(tag for tag in self.view.tree.item(item, "tags")
                          if tag in self.view.ROW_TAGS) for item in rows]
-            self.assertTrue(all(a != b for a, b in zip(tags, tags[1:])), list(zip(rows, tags)))
+            self.assertTrue(all(a != b for a, b in zip(tags, tags[1:])), {
+                "height": self.view.tree.winfo_height(),
+                "rows": [(item, tag, self.view.tree.bbox(item)) for item, tag in zip(rows, tags)],
+            })
             return rows
 
         assert_striped()
