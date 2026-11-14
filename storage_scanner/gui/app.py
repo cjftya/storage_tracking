@@ -4,15 +4,16 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from storage_scanner.core.filters import mib_to_bytes, bytes_to_mib
+from storage_scanner.core.models import ScanConfig
 from storage_scanner.gui.controller import ScanController
 from storage_scanner.gui.tree_view import ResultTree
 from storage_scanner.gui.folder_tree import FolderTree
 from storage_scanner.folder.controller import FolderController
 from storage_scanner.folder.models import FolderConfig
-from storage_scanner.options import configured_scan
+from storage_scanner.options import configured_scope
 from storage_scanner.platform_fs.actions import open_folder
 from storage_scanner.platform_fs.paths import path_key
-from storage_scanner.platform_fs.volumes import make_config, validate_roots
+from storage_scanner.platform_fs.volumes import resolve_scope, validate_roots
 
 
 class ScannerApp:
@@ -187,7 +188,7 @@ class ScannerApp:
 
         def work():
             try:
-                result = (*configured_scan(settings), initial)
+                result = (*configured_scope(settings), initial)
             except Exception as exc:
                 result = exc
             results.put(result)
@@ -225,13 +226,16 @@ class ScannerApp:
             # A root may be a subdirectory of an allowed local volume, never an
             # explicitly rejected mount (network, virtual, alias).
             validate_roots(self.discovery, roots)
-            config = make_config(self.discovery, roots=roots, min_size_bytes=mib_to_bytes(self.minimum.get()) if self.scan_mode == "file" else 0,
-                                 excluded_paths=self._lines(self.excludes_text))
+            scope = resolve_scope(self.discovery, roots=roots,
+                                  excluded_paths=self._lines(self.excludes_text))
+            if self.scan_mode == "folder":
+                config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths)
+            else:
+                config = ScanConfig(scope.roots, mib_to_bytes(self.minimum.get()),
+                                    scope.excluded_paths, scope.boundary_paths)
         except ValueError as exc:
             messagebox.showerror("Invalid settings", str(exc), parent=self.root)
             return
-        if self.scan_mode == "folder":
-            config = FolderConfig(config.roots, config.excluded_paths, config.boundary_paths)
         snapshot = self.controller.start(config)
         self.run_id = snapshot.run_id
         self._presented_run_id = None

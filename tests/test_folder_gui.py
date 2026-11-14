@@ -19,6 +19,28 @@ class FolderGuiTests(unittest.TestCase):
     make_app = helpers.GuiTests.make_app
     wait_until = helpers.GuiTests.wait_until
 
+    def test_leaf_placeholder_clears_and_later_children_still_appear(self):
+        self.view.destroy()
+        view = FolderTree(self.root)
+        view.pack(fill="both", expand=True)
+        self.addCleanup(view.destroy)
+        key = path_key(str(Path.cwd() / "fixture"))
+        store = FolderResultStore((key,))
+        store.add_batch((DirectoryDelta(key, 10),))
+        view.reset(store)
+        self.wait_until(lambda: key in view._items)
+        item = view._items[key]
+        view.tree.item(item, open=True)
+        view.tree.focus(item)
+        view._open()
+        self.wait_until(lambda: not view.tree.get_children(item))
+        child = path_key(str(Path(key) / "later"))
+        store.add_batch((DirectoryDelta(child, 5),))
+        view.poll_changes()
+        self.wait_until(lambda: child in view._items)
+        self.assertEqual(view._paths[view.tree.get_children(item)[0]], child)
+        self.assertFalse(self.errors)
+
     def test_default_mode_switch_and_all_run_orders(self):
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
             (Path(directory) / "a").write_bytes(b"123")

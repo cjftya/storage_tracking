@@ -205,3 +205,7 @@ v1.2 테스트와 두 모드의 성능 비교·측정 한계는 [v1.2 검증 기
 python -m storage_scanner.folder.benchmark "C:\Data" --store
 python -m benchmarks.folder_scenarios --files 20000 --repeat 3 --output benchmarks/results/folder.json
 ```
+
+공통 플랫폼 설정은 `ScanScope`로 경로·제외·마운트 경계만 구성하고 각 모드가 자신의 설정 모델을 직접 생성합니다. 기존 파일용 `make_config`와 `configured_scan` API는 유지합니다. 두 결과 트리는 용량 문자열과 행 색상만 `gui/formatting.py`에서 공유합니다.
+
+[Linux CI](.github/workflows/tests.yml)는 Ubuntu 24.04의 시스템 Python·Tk·Xvfb에서 전체 테스트와 컴파일 검사를 실행합니다. Tk 초기화가 실패하면 테스트를 건너뛰지 않고 CI가 실패합니다. Linux 전용 통합 테스트는 실제 symlink 순환, 파일명 대소문자 구별, 접근 권한 거부와 네이티브 마운트 탐색을 검사하며 직접 만든 임시 폴더만 사용합니다. 실제 USB 장치와 privileged bind mount 생성은 별도 수동 검증 대상입니다.

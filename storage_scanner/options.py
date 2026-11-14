@@ -5,7 +5,7 @@ from pathlib import Path
 
 from storage_scanner.core.filters import mib_to_bytes
 from storage_scanner.platform_fs.paths import path_key
-from storage_scanner.platform_fs.volumes import discover_volumes, make_config, validate_roots
+from storage_scanner.platform_fs.volumes import discover_volumes, resolve_scope, validate_roots
 
 
 def argument_parser(description):
@@ -52,12 +52,19 @@ def load_settings(args):
     }
 
 
-def configured_scan(settings):
+def configured_scope(settings):
     discovery = discover_volumes(settings["include_removable"])
     if settings["roots"] is not None:
         validate_roots(discovery, settings["roots"])
     excludes = settings["extra_exclusions"]
     if settings["use_default_exclusions"]:
         excludes = (*discovery.default_exclusions, *excludes)
-    return discovery, make_config(discovery, roots=settings["roots"],
-                                  min_size_bytes=settings["min_size_bytes"], excluded_paths=excludes)
+    return discovery, resolve_scope(discovery, roots=settings["roots"], excluded_paths=excludes)
+
+
+def configured_scan(settings):
+    """Preserve the existing file-only configuration API."""
+    from storage_scanner.core.models import ScanConfig
+    discovery, scope = configured_scope(settings)
+    return discovery, ScanConfig(scope.roots, settings["min_size_bytes"],
+                                 scope.excluded_paths, scope.boundary_paths)
