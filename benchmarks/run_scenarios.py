@@ -19,7 +19,7 @@ def gui_measure(path, minimum):
 
     root = tk.Tk()
     settings = {"roots": (path,), "min_size_bytes": minimum, "extra_exclusions": (),
-                "include_removable": False, "use_default_exclusions": True, "update_ms": 700}
+                "include_removable": False, "use_default_exclusions": True, "update_ms": 1000}
     app = ScannerApp(root, settings, notify_on_completion=False)
     output = {}
     started = None
@@ -61,7 +61,9 @@ def gui_measure(path, minimum):
                         app.results.tree.item(item, open=True)
                         app.results.tree.focus(item)
                         app.results._open()
-            if snapshot.finished and not app.results._pending and refresh_count:
+            if (snapshot.finished and app._presented_run_id == snapshot.run_id
+                    and not app.results._pending and not app.results._dirty
+                    and not app.results._poll_changes and refresh_count):
                 output.update(asdict(snapshot.summary) if snapshot.summary else {})
                 output.update(gui_wall_seconds=time.perf_counter() - started,
                               tree_refresh_seconds=refresh_seconds,

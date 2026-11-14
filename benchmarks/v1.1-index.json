@@ -1,0 +1,50 @@
+{
+  "samples": [
+    {
+      "mode": "baseline",
+      "matches": 20000,
+      "index_seconds": 0.33784819999709725,
+      "peak_process_memory_bytes": 32329728
+    },
+    {
+      "mode": "current",
+      "matches": 20000,
+      "index_seconds": 0.3327916999987792,
+      "peak_process_memory_bytes": 32231424
+    },
+    {
+      "mode": "baseline",
+      "matches": 20000,
+      "index_seconds": 0.2716504999989411,
+      "peak_process_memory_bytes": 32436224
+    },
+    {
+      "mode": "current",
+      "matches": 20000,
+      "index_seconds": 0.2851035000057891,
+      "peak_process_memory_bytes": 31875072
+    },
+    {
+      "mode": "baseline",
+      "matches": 20000,
+      "index_seconds": 0.21106659999350086,
+      "peak_process_memory_bytes": 32669696
+    },
+    {
+      "mode": "current",
+      "matches": 20000,
+      "index_seconds": 0.22960240000247722,
+      "peak_process_memory_bytes": 31633408
+    }
+  ],
+  "medians": {
+    "baseline": {
+      "index_seconds": 0.2716504999989411,
+      "peak_process_memory_bytes": 32436224
+    },
+    "current": {
+      "index_seconds": 0.2851035000057891,
+      "peak_process_memory_bytes": 31875072
+    }
+  }
+}

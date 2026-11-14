@@ -20,6 +20,8 @@ class ResultStore(Protocol):
     def add_batch(self, matches: tuple[FileMatch, ...]) -> None: ...
     def children(self, parent: str | None, offset: int = 0, limit: int = 200) -> tuple[ResultNode, ...]: ...
     def child_count(self, parent: str | None) -> int: ...
+    def children_page(self, parent: str | None, offset: int = 0, limit: int = 200) -> tuple[int, tuple[ResultNode, ...]]: ...
+    def node(self, path: str) -> ResultNode | None: ...
     def take_changes(self, limit: int = 100) -> tuple[str | None, ...]: ...
 
 
@@ -91,12 +93,24 @@ class MemoryResultStore:
                 for folder, size in totals.items():
                     node = self._nodes[folder]
                     self._nodes[folder] = replace(node, size_bytes=node.size_bytes + size)
+                    # A dirty directory means both its own row and its child
+                    # list may have changed, including size-only ancestors.
+                    self._changes.add(folder)
 
-    def children(self, parent, offset=0, limit=200):
+    def node(self, path):
+        with self._lock:
+            return self._nodes.get(path)
+
+    def children_page(self, parent, offset=0, limit=200):
+        """Copy a bounded, consistent page; never hold the lock during Tk work."""
         if offset < 0 or limit < 0:
             raise ValueError("Page offset and limit must be nonnegative")
         with self._lock:
-            return tuple(self._nodes[key] for key in self._children.get(parent, ())[offset:offset + limit])
+            keys = self._children.get(parent, ())
+            return len(keys), tuple(self._nodes[key] for key in keys[offset:offset + limit])
+
+    def children(self, parent, offset=0, limit=200):
+        return self.children_page(parent, offset, limit)[1]
 
     def child_count(self, parent):
         with self._lock:

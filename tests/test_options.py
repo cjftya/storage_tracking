@@ -7,6 +7,17 @@ from storage_scanner.options import argument_parser, load_settings
 
 
 class OptionTests(unittest.TestCase):
+    def test_default_and_custom_gui_period_keep_small_minimum(self):
+        settings = load_settings(argument_parser("test").parse_args([]))
+        self.assertEqual(settings["update_ms"], 1000)
+        self.assertEqual(settings["min_size_bytes"], 100 * 1024 ** 2)
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "config.json"
+            config.write_text(json.dumps({"gui_update_ms": 700, "min_size_mib": "0.5"}))
+            settings = load_settings(argument_parser("test").parse_args(["--config", str(config)]))
+            self.assertEqual(settings["update_ms"], 700)
+            self.assertEqual(settings["min_size_bytes"], 524288)
+
     def test_config_and_cli_precedence(self):
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / "config.json"

@@ -71,3 +71,20 @@ class ResultTests(unittest.TestCase):
         totals = {node.path: node.size_bytes for node in store.children(None)}
         self.assertEqual(totals[self.root], 13000)
         self.assertEqual(totals[nested], 500)
+
+    def test_size_only_ancestors_are_dirty_and_pages_are_immutable(self):
+        first = self.match(os.path.join("a", "b", "first"), 100)
+        self.store.add_batch((first,))
+        total, page = self.store.children_page(None)
+        self.assertEqual(total, 1)
+        while self.store.take_changes():
+            pass
+        self.store.add_batch((self.match(os.path.join("a", "b", "second"), 200),))
+        changes = set()
+        while batch := self.store.take_changes(1):
+            changes.update(batch)
+        self.assertEqual(changes, {self.root, os.path.join(self.root, "a"),
+                                  os.path.join(self.root, "a", "b")})
+        self.assertEqual(page[0].size_bytes, 100)
+        self.assertEqual(self.store.node(self.root).size_bytes, 300)
+        self.assertEqual(self.store.children_page(os.path.dirname(first.path), 1, 1)[0], 2)

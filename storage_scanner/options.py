@@ -43,7 +43,7 @@ def load_settings(args):
         "extra_exclusions": tuple(path_key(p) for p in (*data.get("excluded_paths", ()), *args.exclude)),
         "include_removable": args.include_removable or data.get("include_removable", False),
         "use_default_exclusions": not args.no_default_excludes and data.get("use_default_exclusions", True),
-        "update_ms": data.get("gui_update_ms", 700),
+        "update_ms": data.get("gui_update_ms", 1000),
     }
 
 

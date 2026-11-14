@@ -16,7 +16,7 @@ class ScannerApp:
     def __init__(self, root, settings, *, notify_on_completion=True):
         self.root = root
         self.settings = dict(settings)
-        self.update_ms = settings.get("update_ms", 700)
+        self.update_ms = settings.get("update_ms", 1000)
         if not isinstance(self.update_ms, int) or self.update_ms < 50:
             raise ValueError("gui_update_ms must be an integer >= 50")
         self.controller = ScanController()
@@ -62,7 +62,7 @@ class ScannerApp:
         scope.columnconfigure(1, weight=1)
         ttk.Label(scope, text="Local volumes only; directory links are skipped. Expand folders to load matches.").grid(
             row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
-        ttk.Label(frame, text="폴더 용량은 하위 검색 결과 파일의 합계입니다. 검색이 끝나면 결과를 표시합니다.").pack(
+        ttk.Label(frame, text="폴더 용량은 하위 검색 결과 파일의 합계입니다. 검색 중에도 결과를 주기적으로 표시합니다.").pack(
             fill="x", pady=(0, 6))
         self.results = ResultTree(frame, on_open_folder=self.open_folder)
         self.results.pack(fill="both", expand=True)
@@ -140,7 +140,7 @@ class ScannerApp:
         if self._notification_timer is not None:
             self.root.after_cancel(self._notification_timer)
             self._notification_timer = None
-        self.results.reset(None)
+        self.results.reset(snapshot.store, snapshot.run_id)
         self.cancel_button.configure(state="normal")
         self.status.set("Scanning…")
         self.current_path.set("")
@@ -157,11 +157,14 @@ class ScannerApp:
         if snapshot and snapshot.run_id == self.run_id:
             progress = snapshot.progress
             state = "Scanning"
+            if not snapshot.finished or self._presented_run_id != snapshot.run_id:
+                self.results.poll_changes()
             if snapshot.finished:
                 self.cancel_button.configure(state="disabled")
                 state = "Failed" if snapshot.error else "Cancelled" if snapshot.summary.cancelled else "Completed"
                 if self._presented_run_id != snapshot.run_id:
-                    self.results.reset(snapshot.store)
+                    # finished is published only after the collector's final
+                    # batch. Drain its remaining changes without rebuilding.
                     self._presented_run_id = snapshot.run_id
             self.status.set(f"{state} | scanned {progress.files_scanned:,} files / {progress.directories_scanned:,} folders"
                             f" | matches {progress.files_matched:,} | errors {progress.errors:,}"

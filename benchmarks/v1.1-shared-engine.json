@@ -1,0 +1,197 @@
+{
+  "baseline_ref": "2b67874e30c32eb669c1ce3c8cbb0e42310d03c6",
+  "method": "Same owned fixture, alternating process order; engine only; min size 0; 3000 empty directories",
+  "samples": [
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.42410450000170385,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 27136000,
+      "version": "baseline",
+      "trial": 0
+    },
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.4085789000018849,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 26374144,
+      "version": "current",
+      "trial": 0
+    },
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.5499761999963084,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 26660864,
+      "version": "current",
+      "trial": 1
+    },
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.47666609999578213,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 26640384,
+      "version": "baseline",
+      "trial": 1
+    },
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.3829792999968049,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 26640384,
+      "version": "baseline",
+      "trial": 2
+    },
+    {
+      "files_scanned": 0,
+      "directories_scanned": 3001,
+      "files_matched": 0,
+      "errors": 0,
+      "elapsed_seconds": 0.3804471999974339,
+      "cancelled": false,
+      "roots": [
+        "c:\\users\\cjfty\\documents\\dev\\storage_tracking\\shared-engine-09plmw1t\\empty-directories"
+      ],
+      "excluded_paths": [
+        "C:\\WINDOWS",
+        "c:\\System Volume Information",
+        "c:\\$Recycle.Bin",
+        "c:\\Recovery",
+        "c:\\$WinREAgent",
+        "g:\\System Volume Information",
+        "g:\\$Recycle.Bin",
+        "g:\\Recovery",
+        "g:\\$WinREAgent"
+      ],
+      "min_size_bytes": 0,
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.13.15",
+      "store_enabled": false,
+      "files_per_second": 0.0,
+      "peak_process_memory_bytes": 26386432,
+      "version": "current",
+      "trial": 2
+    }
+  ],
+  "source_identical_after_newline_normalization": {
+    "storage_scanner/core/scanner.py": true,
+    "storage_scanner/core/models.py": true,
+    "storage_scanner/platform_fs/actions.py": true,
+    "storage_scanner/platform_fs/linux.py": true,
+    "storage_scanner/platform_fs/metrics.py": true,
+    "storage_scanner/platform_fs/paths.py": true,
+    "storage_scanner/platform_fs/volumes.py": true,
+    "storage_scanner/platform_fs/windows.py": true,
+    "storage_scanner/platform_fs/__init__.py": true
+  }
+}

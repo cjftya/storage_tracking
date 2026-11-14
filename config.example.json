@@ -3,5 +3,5 @@
   "include_removable": false,
   "use_default_exclusions": true,
   "excluded_paths": [],
-  "gui_update_ms": 700
+  "gui_update_ms": 1000
 }

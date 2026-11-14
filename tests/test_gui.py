@@ -34,12 +34,12 @@ class GuiTests(unittest.TestCase):
         self.addCleanup(info_patch.stop)
         self.addCleanup(error_patch.stop)
 
-    def make_app(self, directory, minimum=0):
+    def make_app(self, directory, minimum=0, update_ms=50):
         from storage_scanner.gui.app import ScannerApp
         if self.view.winfo_exists():
             self.view.destroy()
         settings = {"roots": (directory,), "min_size_bytes": minimum, "extra_exclusions": (),
-                    "include_removable": False, "use_default_exclusions": True, "update_ms": 50}
+                    "include_removable": False, "use_default_exclusions": True, "update_ms": update_ms}
         app = ScannerApp(self.root, settings)
 
         def cleanup():
@@ -176,8 +176,7 @@ class GuiTests(unittest.TestCase):
                     while not app.controller.snapshot().finished and time.perf_counter() < deadline:
                         self.root.update()
                         if not app.controller.snapshot().finished:
-                            self.assertIsNone(app.results.store)
-                            self.assertFalse(app.results.tree.get_children())
+                            self.assertIs(app.results.store, app.controller.snapshot().store)
                         time.sleep(0.002)
                     first = app.controller.snapshot()
                     self.assertTrue(first.summary.cancelled)
@@ -188,8 +187,7 @@ class GuiTests(unittest.TestCase):
                         snapshot = app.controller.snapshot()
                         if snapshot.finished:
                             break
-                        self.assertIsNone(app.results.store)
-                        self.assertFalse(app.results.tree.get_children())
+                        self.assertIs(app.results.store, snapshot.store)
                         time.sleep(0.002)
                     self.assertTrue(snapshot.finished)
                     self.assertEqual(snapshot.store.match_count, 20000)
@@ -214,7 +212,9 @@ class GuiTests(unittest.TestCase):
                     app.results, "refresh", wraps=app.results.refresh) as refresh:
                 app.start()
                 self.wait_until(lambda: self.showinfo.called)
-                self.assertEqual(reset.call_count, 2)  # Clear at start, attach completed store once.
+                self.assertEqual(reset.call_count, 1)  # Attach live store once, never rebuild at completion.
+                self.wait_until(lambda: not app.results._pending and not app.results._poll_changes
+                                and app.results._render_timer is None)
                 folder = path_key(directory)
                 item = app.results._items[folder]
                 self.assertEqual(app.results.tree.item(item, "values")[1], "300")
@@ -223,13 +223,13 @@ class GuiTests(unittest.TestCase):
                     self.root.after_cancel(app._timer)
                     app._tick()
                     self.root.update()
-                self.assertEqual(reset.call_count, 2)
+                self.assertEqual(reset.call_count, 1)
                 self.assertEqual(refresh.call_count, before)
                 self.assertEqual(self.showinfo.call_count, 1)
                 app.results.tree.item(item, open=True)
                 app.results.tree.focus(item)
                 app.results.tree.event_generate("<<TreeviewOpen>>")
-                self.root.update()
+                self.wait_until(lambda: app.results._offsets[folder] == 3)
                 children = app.results.tree.get_children(item)
                 self.assertEqual(len(children), 3)
                 self.assertTrue(all(app.results.tree.item(child, "values")[1] == "100" for child in children))
@@ -292,3 +292,165 @@ class GuiTests(unittest.TestCase):
                               ScanSummary(0, 0, 0, 0, 0.1, False), True, None, 0.1)
             app._notify_finished(old)
             self.showinfo.assert_not_called()
+
+    def test_one_second_live_updates_and_cancel_final_batch(self):
+        from threading import Event
+        from storage_scanner.core.models import ScanProgress, ScanSummary
+        next_batch = Event()
+        finish = Event()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            app = self.make_app(directory, update_ms=1000)
+            folder = path_key(directory)
+            subfolder = str(Path(folder) / "nested")
+
+            def stream(config, on_batch, on_progress, should_cancel):
+                on_batch((FileMatch(str(Path(subfolder) / "first"), 100),))
+                on_progress(ScanProgress(1, 2, 1, 0, subfolder))
+                if next_batch.wait(8):
+                    on_batch((FileMatch(str(Path(subfolder) / "second"), 200),))
+                    on_progress(ScanProgress(2, 2, 2, 0, subfolder))
+                finish.wait(8)
+                # Emulate the engine's final partial batch on cancellation.
+                on_batch((FileMatch(str(Path(subfolder) / "last"), 400),))
+                on_progress(ScanProgress(3, 2, 3, 0, subfolder))
+                return ScanSummary(3, 2, 3, 0, 0.1, should_cancel())
+
+            try:
+                with patch("storage_scanner.gui.controller.scan", side_effect=stream):
+                    app.start()
+                    self.wait_until(lambda: folder in app.results._items)
+                    self.assertFalse(app.controller.snapshot().finished)
+                    root_item = app.results._items[folder]
+                    app.results.tree.item(root_item, open=True)
+                    app.results.tree.focus(root_item)
+                    app.results._open()
+                    self.wait_until(lambda: subfolder in app.results._items)
+                    nested_item = app.results._items[subfolder]
+                    self.assertEqual(len(app.results.tree.get_children(nested_item)), 1)
+                    self.assertEqual(len(app.results._paths), 2)  # Closed children stay lazy.
+                    next_batch.set()
+                    self.wait_until(lambda: app.results.tree.item(root_item, "values")[1] == "300")
+                    self.assertFalse(app.controller.snapshot().finished)
+                    self.assertEqual(app.results.tree.item(nested_item, "values")[1], "300")
+                    self.assertEqual(len(app.results._paths), 2)
+                    app.results.tree.item(nested_item, open=True)
+                    app.results.tree.focus(nested_item)
+                    app.results._open()
+                    self.wait_until(lambda: app.results._offsets[subfolder] == 2)
+                    app.cancel()
+                    finish.set()
+                    self.wait_until(lambda: app.status.get().startswith("Cancelled"))
+                    self.wait_until(lambda: app.results._offsets[subfolder] == 3)
+                    snapshot = app.controller.snapshot()
+                    self.assertEqual(snapshot.store.match_count, snapshot.summary.files_matched)
+                    self.assertEqual(snapshot.store.match_count, 3)
+                    self.assertEqual(app.results.tree.item(root_item, "values")[1], "700")
+                    self.assertEqual(app.results._items[folder], root_item)
+                    self.assertEqual(len(app.results.tree.get_children(nested_item)), 3)
+                    self.assertFalse(self.showinfo.called)
+                    self.assertFalse(self.errors)
+            finally:
+                next_batch.set()
+                finish.set()
+
+    def test_live_paging_preserves_loaded_range_and_selection(self):
+        folder = path_key(str(Path.cwd() / "live-paging"))
+        store = MemoryResultStore((folder,))
+        store.add_batch(tuple(FileMatch(str(Path(folder) / f"{i}.bin"), i) for i in range(250)))
+        self.view.reset(store)
+        self.wait_until(lambda: folder in self.view._items)
+        item = self.view._items[folder]
+        self.view.tree.item(item, open=True)
+        self.view.tree.focus(item)
+        self.view._open()
+        self.wait_until(lambda: self.view._offsets[folder] == 200)
+        first_page = self.view.tree.get_children(item)[:200]
+        self.view.tree.focus(item + ":more")
+        self.view._more()
+        self.wait_until(lambda: self.view._offsets[folder] == 250)
+        self.view.tree.selection_set(first_page[10])
+        self.root.geometry("900x500")
+        self.root.deiconify()
+        self.root.update()
+        self.view.tree.yview_moveto(0.4)
+        self.root.update_idletasks()
+        top_row = self.view.tree.identify_row(40)
+        self.assertTrue(top_row)
+        store.add_batch(tuple(FileMatch(str(Path(folder) / f"{i}.bin"), i) for i in range(250, 450)))
+        self.view.poll_changes()
+        self.wait_until(lambda: self.view._offsets[folder] == 400)
+        self.assertEqual(self.view.tree.get_children(item)[:200], first_page)
+        self.assertEqual(self.view.tree.selection(), (first_page[10],))
+        self.assertEqual(self.view.tree.identify_row(40), top_row)
+        self.assertTrue(self.view.tree.item(item, "open"))
+        self.assertEqual(len(self.view.tree.get_children(item)), 401)
+        for _ in range(3):
+            self.view.poll_changes()
+            self.view.refresh()
+        self.assertEqual(len(self.view._paths), 401)
+        self.assertEqual(self.view._offsets[folder], 400)
+        self.assertFalse(self.errors)
+
+    def test_change_backlog_yields_and_is_not_lost(self):
+        folder = path_key(str(Path.cwd() / "dirty-backlog"))
+        store = MemoryResultStore((folder,))
+        store.add_batch(tuple(FileMatch(str(Path(folder) / str(i) / "file"), 1) for i in range(1800)))
+        self.view.reset(store)
+        self.wait_until(lambda: folder in self.view._items)
+        item = self.view._items[folder]
+        self.view.tree.item(item, open=True)
+        self.view.tree.focus(item)
+        self.view._open()
+        self.wait_until(lambda: self.view._offsets[folder] == 200)
+        store.add_batch(tuple(FileMatch(str(Path(folder) / str(i) / "next"), 2) for i in range(1800)))
+        self.view.poll_changes()
+        self.view.refresh()
+        self.assertTrue(self.view._dirty or self.view._poll_changes)
+        heartbeat = []
+        self.root.after(0, lambda: heartbeat.append(True))
+        self.wait_until(lambda: bool(heartbeat))
+        self.wait_until(lambda: not self.view._poll_changes and not self.view._dirty and not self.view._pending)
+        self.assertEqual(self.view.tree.item(item, "values")[1], "5,400")
+        for child in self.view.tree.get_children(item)[:200]:
+            self.assertEqual(self.view.tree.item(child, "values")[1], "3")
+        self.assertEqual(len(self.view._paths), 201)
+        self.assertFalse(self.errors)
+
+    def test_large_reset_uses_leaf_deletes_and_isolates_stale_callbacks(self):
+        # A single 20,000-row subtree would defeat deletion split by root.
+        parent = self.view.tree.insert("", "end", open=True, text="old")
+        self.view._paths[parent] = "old"
+        for i in range(20000):
+            item = self.view.tree.insert(parent, "end", text=str(i))
+            self.view._paths[item] = str(i)
+        old_tree = self.view.tree
+        generation = self.view._generation
+        folder = path_key(str(Path.cwd() / "new-run"))
+        store = MemoryResultStore((folder,))
+        store.add_batch((FileMatch(str(Path(folder) / "new-file"), 123),))
+        self.view.reset(store, run_id=2)
+        self.view._render_pending(generation)
+        self.view._open(SimpleNamespace(widget=old_tree))
+        self.assertFalse(self.view.tree.get_children())
+        self.assertIsNot(self.view.tree, old_tree)
+        actual_delete = old_tree.delete
+        deleted = []
+
+        def leaf_delete(item):
+            self.assertFalse(old_tree.get_children(item))
+            deleted.append(item)
+            actual_delete(item)
+
+        heartbeat = []
+        self.root.after(0, lambda: heartbeat.append(True))
+        with patch.object(old_tree, "delete", side_effect=leaf_delete):
+            for run_id in range(3, 7):
+                self.view.reset(store, run_id=run_id)
+            self.wait_until(lambda: bool(heartbeat))
+            self.assertTrue(self.view._retired)
+            self.wait_until(lambda: not self.view._retired, timeout=10)
+        self.wait_until(lambda: folder in self.view._items)
+        self.assertEqual(len(deleted), 20001)
+        self.assertEqual(self.view.run_id, 6)
+        self.assertEqual(len(self.view._paths), 1)
+        self.assertFalse(self.errors)

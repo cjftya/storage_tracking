@@ -1,0 +1,74 @@
+{
+  "samples": [
+    {
+      "mode": "baseline",
+      "file_rows": 100000,
+      "reset_seconds": 0.02292460000171559,
+      "cleanup_seconds": 0.03511830000206828,
+      "max_event_gap_seconds": 0.02313720000529429,
+      "max_tk_call_seconds": 0.017631000002438668,
+      "peak_process_memory_bytes": 79249408
+    },
+    {
+      "mode": "baseline",
+      "file_rows": 100000,
+      "reset_seconds": 0.021653700001479592,
+      "cleanup_seconds": 0.03321429999778047,
+      "max_event_gap_seconds": 0.021892600001592655,
+      "max_tk_call_seconds": 0.017885499997646548,
+      "peak_process_memory_bytes": 79306752
+    },
+    {
+      "mode": "baseline",
+      "file_rows": 100000,
+      "reset_seconds": 0.022724499998730607,
+      "cleanup_seconds": 0.037236600001051556,
+      "max_event_gap_seconds": 0.02291539999714587,
+      "max_tk_call_seconds": 0.01905850000184728,
+      "peak_process_memory_bytes": 79200256
+    },
+    {
+      "mode": "reset",
+      "file_rows": 100000,
+      "reset_seconds": 0.0024211999989347532,
+      "cleanup_seconds": 1.387729300004139,
+      "max_event_gap_seconds": 0.013322300001163967,
+      "max_tk_call_seconds": 0.0012634000013349578,
+      "peak_process_memory_bytes": 96210944
+    },
+    {
+      "mode": "reset",
+      "file_rows": 100000,
+      "reset_seconds": 0.0020148000039625913,
+      "cleanup_seconds": 1.6014280000017607,
+      "max_event_gap_seconds": 0.01422860000457149,
+      "max_tk_call_seconds": 0.0016679999971529469,
+      "peak_process_memory_bytes": 96145408
+    },
+    {
+      "mode": "reset",
+      "file_rows": 100000,
+      "reset_seconds": 0.007619100004376378,
+      "cleanup_seconds": 1.4260856000037165,
+      "max_event_gap_seconds": 0.03678799999761395,
+      "max_tk_call_seconds": 0.0032640000063111074,
+      "peak_process_memory_bytes": 95952896
+    }
+  ],
+  "medians": {
+    "baseline": {
+      "reset_seconds": 0.022724499998730607,
+      "cleanup_seconds": 0.03511830000206828,
+      "max_event_gap_seconds": 0.02291539999714587,
+      "max_tk_call_seconds": 0.017885499997646548,
+      "peak_process_memory_bytes": 79249408
+    },
+    "reset": {
+      "reset_seconds": 0.0024211999989347532,
+      "cleanup_seconds": 1.4260856000037165,
+      "max_event_gap_seconds": 0.01422860000457149,
+      "max_tk_call_seconds": 0.0016679999971529469,
+      "peak_process_memory_bytes": 96145408
+    }
+  }
+}

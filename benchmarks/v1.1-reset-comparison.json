@@ -1,0 +1,176 @@
+{
+  "samples": [
+    {
+      "mode": "baseline",
+      "file_rows": 30000,
+      "reset_seconds": 0.007028299994999543,
+      "cleanup_seconds": 0.009450199999264441,
+      "max_event_gap_seconds": 0.007780399995681364,
+      "max_tk_call_seconds": 0.006053199998859782,
+      "peak_process_memory_bytes": 47767552
+    },
+    {
+      "mode": "baseline",
+      "file_rows": 30000,
+      "reset_seconds": 0.007299099997908343,
+      "cleanup_seconds": 0.010050499993667472,
+      "max_event_gap_seconds": 0.007478899999114219,
+      "max_tk_call_seconds": 0.005880299999262206,
+      "peak_process_memory_bytes": 47599616
+    },
+    {
+      "mode": "baseline",
+      "file_rows": 30000,
+      "reset_seconds": 0.008069000003160909,
+      "cleanup_seconds": 0.010475800001586322,
+      "max_event_gap_seconds": 0.008249899998190813,
+      "max_tk_call_seconds": 0.006532899999001529,
+      "peak_process_memory_bytes": 47542272
+    },
+    {
+      "mode": "delete",
+      "file_rows": 30000,
+      "reset_seconds": 0.008111099996312987,
+      "cleanup_seconds": 0.011749899997084867,
+      "max_event_gap_seconds": 0.008593799997470342,
+      "max_tk_call_seconds": 0.0080180000004475,
+      "peak_process_memory_bytes": 47513600
+    },
+    {
+      "mode": "delete",
+      "file_rows": 30000,
+      "reset_seconds": 0.005476500002259854,
+      "cleanup_seconds": 0.008105799999611918,
+      "max_event_gap_seconds": 0.005703700000594836,
+      "max_tk_call_seconds": 0.00540049999835901,
+      "peak_process_memory_bytes": 47595520
+    },
+    {
+      "mode": "delete",
+      "file_rows": 30000,
+      "reset_seconds": 0.008331500001077075,
+      "cleanup_seconds": 0.010717899996961933,
+      "max_event_gap_seconds": 0.008537900001101661,
+      "max_tk_call_seconds": 0.008207700004277285,
+      "peak_process_memory_bytes": 47480832
+    },
+    {
+      "mode": "replace",
+      "file_rows": 30000,
+      "reset_seconds": 0.013564599998062477,
+      "cleanup_seconds": 0.020854299997154158,
+      "max_event_gap_seconds": 0.013777399995888118,
+      "max_tk_call_seconds": 0.010499499992874917,
+      "peak_process_memory_bytes": 47501312
+    },
+    {
+      "mode": "replace",
+      "file_rows": 30000,
+      "reset_seconds": 0.01229590000002645,
+      "cleanup_seconds": 0.021347899993998,
+      "max_event_gap_seconds": 0.01271660000202246,
+      "max_tk_call_seconds": 0.009585100000549573,
+      "peak_process_memory_bytes": 47374336
+    },
+    {
+      "mode": "replace",
+      "file_rows": 30000,
+      "reset_seconds": 0.009627799998270348,
+      "cleanup_seconds": 0.01579150000179652,
+      "max_event_gap_seconds": 0.009853900002781302,
+      "max_tk_call_seconds": 0.00791659999958938,
+      "peak_process_memory_bytes": 47177728
+    },
+    {
+      "mode": "chunk",
+      "file_rows": 30000,
+      "reset_seconds": 0.0026794000004883856,
+      "cleanup_seconds": 0.46784029999980703,
+      "max_event_gap_seconds": 0.006752600005711429,
+      "max_tk_call_seconds": 0.0003969000026700087,
+      "peak_process_memory_bytes": 49094656
+    },
+    {
+      "mode": "chunk",
+      "file_rows": 30000,
+      "reset_seconds": 0.0010497000039322302,
+      "cleanup_seconds": 0.5124930000019958,
+      "max_event_gap_seconds": 0.010040200002549682,
+      "max_tk_call_seconds": 0.005909100000280887,
+      "peak_process_memory_bytes": 48738304
+    },
+    {
+      "mode": "chunk",
+      "file_rows": 30000,
+      "reset_seconds": 0.001040900002408307,
+      "cleanup_seconds": 0.42394160000549164,
+      "max_event_gap_seconds": 0.004344100001617335,
+      "max_tk_call_seconds": 0.0010315999970771372,
+      "peak_process_memory_bytes": 48799744
+    },
+    {
+      "mode": "reset",
+      "file_rows": 30000,
+      "reset_seconds": 0.002010399999562651,
+      "cleanup_seconds": 0.47869160000118427,
+      "max_event_gap_seconds": 0.006442400001105852,
+      "max_tk_call_seconds": 0.001142100001743529,
+      "peak_process_memory_bytes": 56545280
+    },
+    {
+      "mode": "reset",
+      "file_rows": 30000,
+      "reset_seconds": 0.0019478999965940602,
+      "cleanup_seconds": 0.4486262999998871,
+      "max_event_gap_seconds": 0.006993200004217215,
+      "max_tk_call_seconds": 0.002505599994037766,
+      "peak_process_memory_bytes": 51015680
+    },
+    {
+      "mode": "reset",
+      "file_rows": 30000,
+      "reset_seconds": 0.0021882999935769476,
+      "cleanup_seconds": 0.4217858999982127,
+      "max_event_gap_seconds": 0.004806800003279932,
+      "max_tk_call_seconds": 0.0014260000025387853,
+      "peak_process_memory_bytes": 48869376
+    }
+  ],
+  "medians": {
+    "baseline": {
+      "reset_seconds": 0.007299099997908343,
+      "cleanup_seconds": 0.010050499993667472,
+      "max_event_gap_seconds": 0.007780399995681364,
+      "max_tk_call_seconds": 0.006053199998859782,
+      "peak_process_memory_bytes": 47599616
+    },
+    "delete": {
+      "reset_seconds": 0.008111099996312987,
+      "cleanup_seconds": 0.010717899996961933,
+      "max_event_gap_seconds": 0.008537900001101661,
+      "max_tk_call_seconds": 0.0080180000004475,
+      "peak_process_memory_bytes": 47513600
+    },
+    "replace": {
+      "reset_seconds": 0.01229590000002645,
+      "cleanup_seconds": 0.020854299997154158,
+      "max_event_gap_seconds": 0.01271660000202246,
+      "max_tk_call_seconds": 0.009585100000549573,
+      "peak_process_memory_bytes": 47374336
+    },
+    "chunk": {
+      "reset_seconds": 0.0010497000039322302,
+      "cleanup_seconds": 0.46784029999980703,
+      "max_event_gap_seconds": 0.006752600005711429,
+      "max_tk_call_seconds": 0.0010315999970771372,
+      "peak_process_memory_bytes": 48799744
+    },
+    "reset": {
+      "reset_seconds": 0.002010399999562651,
+      "cleanup_seconds": 0.4486262999998871,
+      "max_event_gap_seconds": 0.006442400001105852,
+      "max_tk_call_seconds": 0.0014260000025387853,
+      "peak_process_memory_bytes": 51015680
+    }
+  }
+}

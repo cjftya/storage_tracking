@@ -1,4 +1,4 @@
-"""Render completed results on demand, with bounded work and folder paging."""
+"""Render live append-only results with bounded work and folder paging."""
 from collections import deque
 import time
 from tkinter import Menu, ttk
@@ -24,9 +24,23 @@ class ResultTree(ttk.Frame):
         super().__init__(parent)
         self.on_open_folder = on_open_folder
         self._render_timer = None
+        self._cleanup_timer = None
+        self._generation = 0
+        self._retired = deque()
+        self._paths = {}
         self._context_path = None
         self.menu = Menu(self, tearoff=False)
         self.menu.add_command(label="열기", command=self._open_context_folder)
+        self.vertical = ttk.Scrollbar(self, orient="vertical")
+        self.horizontal = ttk.Scrollbar(self, orient="horizontal")
+        self.vertical.grid(row=0, column=1, sticky="ns")
+        self.horizontal.grid(row=1, column=0, sticky="ew")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.tree = None
+        self.reset(None)
+
+    def _create_tree(self):
         self.tree = ttk.Treeview(self, columns=("size", "bytes"), selectmode="browse")
         self.tree.heading("#0", text="Path / file")
         self.tree.heading("size", text="용량 (검색 결과 합계)")
@@ -34,31 +48,35 @@ class ResultTree(ttk.Frame):
         self.tree.column("#0", width=580, minwidth=200)
         self.tree.column("size", width=180, anchor="e", stretch=False)
         self.tree.column("bytes", width=150, anchor="e", stretch=False)
-        vertical = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-        horizontal = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
-        self.tree.configure(yscrollcommand=vertical.set, xscrollcommand=horizontal.set)
+        self.vertical.configure(command=self.tree.yview)
+        self.horizontal.configure(command=self.tree.xview)
+        self.tree.configure(yscrollcommand=self.vertical.set, xscrollcommand=self.horizontal.set)
         self.tree.grid(row=0, column=0, sticky="nsew")
-        vertical.grid(row=0, column=1, sticky="ns")
-        horizontal.grid(row=1, column=0, sticky="ew")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
         self.tree.bind("<<TreeviewOpen>>", self._open)
         self.tree.bind("<Double-1>", self._more)
         self.tree.bind("<Return>", self._more)
         self.tree.bind("<Button-3>", self._show_context_menu)
         self.tree.bind("<Shift-F10>", self._show_context_menu)
-        self.reset(None)
 
-    def reset(self, store: ResultStore | None):
+    def reset(self, store: ResultStore | None, run_id=None):
+        self._generation += 1
+        self.run_id = run_id
         if self._render_timer is not None:
             self.after_cancel(self._render_timer)
             self._render_timer = None
         self.menu.unpost()
         self._context_path = None
         self.store = store
-        children = self.tree.get_children()
-        if children:
-            self.tree.delete(*children)
+        if self.tree is not None:
+            self.tree.grid_remove()
+            self.tree.configure(yscrollcommand="", xscrollcommand="")
+            # Parents are always inserted before descendants. Reverse insertion
+            # order makes every delete a leaf (plus at most two sentinel rows).
+            # Keep the old mapping alive through its iterator, without copying it.
+            self._retired.append((self.tree, reversed(self._paths)))
+            if self._cleanup_timer is None:
+                self._cleanup_timer = self.after(1, self._cleanup_retired)
+        self._create_tree()
         self._items = {None: ""}
         self._paths = {}
         self._directories = set()
@@ -67,25 +85,57 @@ class ResultTree(ttk.Frame):
         self._pending = deque([None])
         self._queued = {None}
         self._more_items = {}
+        self._dirty = deque()
+        self._poll_changes = False
         if store is not None:
             self._schedule_render()
 
-    def _schedule_render(self):
-        if self._render_timer is None and self._pending:
-            self._render_timer = self.after_idle(self._render_pending)
+    def _cleanup_retired(self):
+        self._cleanup_timer = None
+        deadline = time.perf_counter() + self.TIME_BUDGET
+        work = 0
+        while self._retired and work < self.INSERT_BUDGET and time.perf_counter() < deadline:
+            tree, items = self._retired[0]
+            item = next(items, None)
+            if item is None:
+                tree.destroy()  # Empty now; no recursive subtree destruction.
+                self._retired.popleft()
+            else:
+                tree.delete(item)
+            work += 1
+        if self._retired:
+            self._cleanup_timer = self.after(1, self._cleanup_retired)
 
-    def _render_pending(self):
+    def poll_changes(self):
+        """Called by the app's status timer, never by the collector thread."""
+        if self.store is not None:
+            self._poll_changes = True
+            self._schedule_render()
+
+    def _schedule_render(self):
+        if self._render_timer is None and (self._pending or self._dirty or self._poll_changes):
+            self._render_timer = self.after(1, self._render_pending, self._generation)
+
+    def _render_pending(self, generation):
+        if generation != self._generation:
+            return
         self._render_timer = None
         self.refresh()
         self._schedule_render()
 
     def destroy(self):
+        self._generation += 1
         if self._render_timer is not None:
             self.after_cancel(self._render_timer)
             self._render_timer = None
+        if self._cleanup_timer is not None:
+            self.after_cancel(self._cleanup_timer)
+            self._cleanup_timer = None
         super().destroy()
 
     def _show_context_menu(self, event):
+        if getattr(event, "widget", self.tree) is not self.tree:
+            return
         if event.type.name == "KeyPress":
             item = self.tree.focus()
             bounds = self.tree.bbox(item) if item else ()
@@ -121,11 +171,15 @@ class ResultTree(ttk.Frame):
         self._schedule_render()
 
     def _open(self, event=None):
+        if event is not None and getattr(event, "widget", self.tree) is not self.tree:
+            return
         item = self.tree.focus()
         if item in self._paths:
             self._enqueue(self._paths[item])
 
     def _more(self, event=None):
+        if event is not None and getattr(event, "widget", self.tree) is not self.tree:
+            return
         item = self.tree.identify_row(event.y) if event and event.type.name != "KeyPress" else self.tree.focus()
         if item in self._more_items:
             path = self._more_items.pop(item)
@@ -139,22 +193,49 @@ class ResultTree(ttk.Frame):
             return 0
         deadline = time.perf_counter() + self.TIME_BUDGET
         inserted = 0
-        # The store is attached only after collection finishes. No polling for
-        # changes or rewriting already displayed rows is needed.
-        while self._pending and inserted < self.INSERT_BUDGET and time.perf_counter() < deadline:
+        work = 0
+        while work < self.INSERT_BUDGET and time.perf_counter() < deadline:
+            if self._poll_changes and not self._dirty:
+                self._dirty.extend(self.store.take_changes(32))
+                if not self._dirty:
+                    self._poll_changes = False
+            if self._dirty:
+                path = self._dirty.popleft()
+                item = self._items.get(path)
+                if path is not None and item is not None:
+                    node = self.store.node(path)
+                    values = (display_size(node.size_bytes), f"{node.size_bytes:,}")
+                    if self.tree.item(item, "values") != values:
+                        self.tree.item(item, values=values)
+                if path is None or (item is not None and self.tree.item(item, "open")):
+                    self._enqueue(path)
+                work += 1
+            if work >= self.INSERT_BUDGET or time.perf_counter() >= deadline:
+                break
+            if not self._pending:
+                if self._dirty or self._poll_changes:
+                    continue
+                break
             path = self._pending.popleft()
             self._queued.discard(path)
             parent = self._items[path]
+            work += 1
             if path is not None and not self.tree.item(parent, "open"):
                 continue
             offset, limit = self._offsets[path], self._limits[path]
-            total = self.store.child_count(path)
-            amount = min(self.INSERT_BUDGET - inserted, limit - offset, total - offset, 32)
-            if amount > 0:
+            amount = min(self.INSERT_BUDGET - work, limit - offset, 32)
+            total, nodes = self.store.children_page(path, offset, max(0, amount))
+            if nodes:
                 dummy = parent + ":placeholder"
                 if self.tree.exists(dummy):
                     self.tree.delete(dummy)
-                for node in self.store.children(path, offset, amount):
+                for node in nodes:
+                    if work >= self.INSERT_BUDGET or time.perf_counter() >= deadline:
+                        break
+                    work += 1
+                    self._offsets[path] += 1
+                    if node.path in self._items:
+                        continue
                     values = (display_size(node.size_bytes), f"{node.size_bytes:,}")
                     item = self.tree.insert(parent, "end", text=node.name, values=values)
                     self._items[node.path] = item
@@ -165,7 +246,6 @@ class ResultTree(ttk.Frame):
                         self._limits[node.path] = self.PAGE_SIZE
                         self.tree.insert(item, "end", iid=item + ":placeholder", text="Expand to load matches")
                     inserted += 1
-                self._offsets[path] += amount
             offset = self._offsets[path]
             if offset < min(total, limit):
                 self._enqueue(path)
