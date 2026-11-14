@@ -6,6 +6,7 @@ from tkinter import filedialog, messagebox, ttk
 from storage_scanner.core.filters import mib_to_bytes, bytes_to_mib
 from storage_scanner.core.models import ScanConfig
 from storage_scanner.gui.controller import ScanController
+from storage_scanner.gui.icon import apply_window_icon
 from storage_scanner.gui.tree_view import ResultTree
 from storage_scanner.gui.folder_tree import FolderTree
 from storage_scanner.folder.controller import FolderController
@@ -43,6 +44,7 @@ class ScannerApp:
         self._folder_open_results = queue.Queue(maxsize=1)
         self._opening_folder = False
         self.root.title("Storage Scanner")
+        apply_window_icon(self.root)
         self.root.geometry("1100x800")
         self.root.minsize(760, 600)
         frame = ttk.Frame(root, padding=12)
