@@ -553,7 +553,11 @@ class GuiTests(unittest.TestCase):
 
             def visible(parent=""):
                 for item in self.view.tree.get_children(parent):
-                    if self.view.tree.bbox(item):
+                    bounds = self.view.tree.bbox(item)
+                    # Linux Tk can return a bbox for an extra row entirely
+                    # below the viewport. Only painted rows must be striped.
+                    if (bounds and bounds[1] < self.view.tree.winfo_height()
+                            and bounds[1] + bounds[3] > 0):
                         rows.append(item)
                     if self.view.tree.item(item, "open"):
                         visible(item)
