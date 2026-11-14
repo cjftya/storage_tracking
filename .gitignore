@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local benchmark runs; versioned measurements live in results/v1.1/.
+benchmarks/results/*.json

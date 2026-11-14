@@ -9,10 +9,12 @@ import sys
 import tarfile
 import tempfile
 
+from benchmarks import BASELINE_REF
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--baseline-ref", default="2b67874e30c32eb669c1ce3c8cbb0e42310d03c6")
+    parser.add_argument("--baseline-ref", default=BASELINE_REF)
     parser.add_argument("--entries", type=int, default=3000)
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--output", type=Path, required=True)

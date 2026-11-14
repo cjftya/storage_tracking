@@ -9,11 +9,12 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
+from benchmarks import BASELINE_REF
 from storage_scanner.gui.tree_view import ResultTree
 from storage_scanner.platform_fs.metrics import peak_memory_bytes
 
 
-def measure(mode, count, visible=False, baseline_ref="2b67874e30c32eb669c1ce3c8cbb0e42310d03c6"):
+def measure(mode, count, visible=False, baseline_ref=BASELINE_REF):
     root = tk.Tk()
     if visible:
         root.geometry("900x650")
@@ -106,7 +107,7 @@ def main():
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--modes", nargs="+", default=["baseline", "delete", "replace", "chunk", "reset"])
     parser.add_argument("--child", help=argparse.SUPPRESS)
-    parser.add_argument("--baseline-ref", default="2b67874e30c32eb669c1ce3c8cbb0e42310d03c6")
+    parser.add_argument("--baseline-ref", default=BASELINE_REF)
     parser.add_argument("--visible", action="store_true", help="Include normal window drawing")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()

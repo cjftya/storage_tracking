@@ -1,4 +1,5 @@
 from pathlib import Path
+import gc
 import tempfile
 import time
 import unittest
@@ -22,17 +23,24 @@ class GuiTests(unittest.TestCase):
         except tk.TclError as exc:
             self.skipTest(f"Tk display unavailable: {exc}")
         self.root.withdraw()
-        self.addCleanup(self.root.destroy)
+        self.addCleanup(self._destroy_root)
         self.view = ResultTree(self.root)
         self.view.pack(fill="both", expand=True)
         self.errors = []
-        self.root.report_callback_exception = lambda *args: self.errors.append(args)
+        errors = self.errors
+        self.root.report_callback_exception = lambda *args: errors.append(args)
         info_patch = patch("storage_scanner.gui.app.messagebox.showinfo")
         error_patch = patch("storage_scanner.gui.app.messagebox.showerror")
         self.showinfo = info_patch.start()
         self.showerror = error_patch.start()
         self.addCleanup(info_patch.stop)
         self.addCleanup(error_patch.stop)
+
+    def _destroy_root(self):
+        self.root.destroy()
+        # Dispose unreachable Tk variables on the GUI thread, before a later
+        # test's worker allocation can trigger cyclic garbage collection.
+        gc.collect()
 
     def make_app(self, directory, minimum=0, update_ms=50):
         from storage_scanner.gui.app import ScannerApp
@@ -97,20 +105,11 @@ class GuiTests(unittest.TestCase):
         self.assertFalse(self.errors)
 
     def test_application_scan_cancel_restart_and_final_stats(self):
-        from storage_scanner.gui.app import ScannerApp
-        self.view.destroy()
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
             with (Path(directory) / "data").open("wb") as handle:
                 handle.truncate(1024)
-            settings = {"roots": (directory,), "min_size_bytes": 0, "extra_exclusions": (),
-                        "include_removable": False, "use_default_exclusions": True, "update_ms": 50}
-            app = ScannerApp(self.root, settings)
-            self.addCleanup(app.controller.close)
+            app = self.make_app(directory)
             end = time.perf_counter() + 10
-            while app.discovery is None and time.perf_counter() < end:
-                self.root.update()
-                time.sleep(0.002)
-            self.assertIsNotNone(app.discovery, app.status.get())
             app.start()
             old_id = app.run_id
             app.cancel()
@@ -127,25 +126,12 @@ class GuiTests(unittest.TestCase):
             self.assertIn("matches 1", app.status.get())
             self.assertEqual(self.showinfo.call_count, 1)
             self.assertFalse(self.errors)
-            for timer in (app._timer, app._discover_timer):
-                if timer:
-                    self.root.after_cancel(timer)
 
     def test_live_large_result_stream_keeps_gui_responsive(self):
-        from unittest.mock import patch
         from storage_scanner.core.models import ScanProgress, ScanSummary
-        from storage_scanner.gui.app import ScannerApp
-        self.view.destroy()
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
-            settings = {"roots": (directory,), "min_size_bytes": 0, "extra_exclusions": (),
-                        "include_removable": False, "use_default_exclusions": True, "update_ms": 50}
-            app = ScannerApp(self.root, settings)
-            self.addCleanup(app.controller.close)
+            app = self.make_app(directory)
             deadline = time.perf_counter() + 10
-            while app.discovery is None and time.perf_counter() < deadline:
-                self.root.update()
-                time.sleep(0.002)
-            self.assertIsNotNone(app.discovery)
             heartbeats = []
             heartbeat_timer = None
 
@@ -194,9 +180,8 @@ class GuiTests(unittest.TestCase):
                     self.assertGreater(len(heartbeats), 3)
                     self.assertFalse(self.errors)
             finally:
-                for timer in (heartbeat_timer, app._timer, app._discover_timer):
-                    if timer:
-                        self.root.after_cancel(timer)
+                if heartbeat_timer is not None:
+                    self.root.after_cancel(heartbeat_timer)
 
     def test_completed_tree_totals_and_notification_are_not_refreshed_each_tick(self):
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:

@@ -9,7 +9,7 @@ from storage_scanner.gui.tree_view import ResultTree
 from storage_scanner.options import configured_scan
 from storage_scanner.platform_fs.actions import open_folder
 from storage_scanner.platform_fs.paths import path_key
-from storage_scanner.platform_fs.volumes import make_config
+from storage_scanner.platform_fs.volumes import make_config, validate_roots
 
 
 class ScannerApp:
@@ -126,7 +126,6 @@ class ScannerApp:
                 raise ValueError("Add at least one scan root")
             # A root may be a subdirectory of an allowed local volume, never an
             # explicitly rejected mount (network, virtual, removable, alias).
-            from storage_scanner.platform_fs.volumes import validate_roots
             validate_roots(self.discovery, roots)
             config = make_config(self.discovery, roots=roots, min_size_bytes=mib_to_bytes(self.minimum.get()),
                                  excluded_paths=self._lines(self.excludes_text))
