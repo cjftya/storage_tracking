@@ -1,11 +1,14 @@
 import queue
-from threading import Thread
+from threading import Thread, Lock
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from storage_scanner.core.filters import mib_to_bytes, bytes_to_mib
 from storage_scanner.gui.controller import ScanController
 from storage_scanner.gui.tree_view import ResultTree
+from storage_scanner.gui.folder_tree import FolderTree
+from storage_scanner.folder.controller import FolderController
+from storage_scanner.folder.models import FolderConfig
 from storage_scanner.options import configured_scan
 from storage_scanner.platform_fs.actions import open_folder
 from storage_scanner.platform_fs.paths import path_key
@@ -21,7 +24,11 @@ class ScannerApp:
         self.update_ms = settings.get("update_ms", 1000)
         if not isinstance(self.update_ms, int) or self.update_ms < 50:
             raise ValueError("gui_update_ms must be an integer >= 50")
-        self.controller = ScanController()
+        self._scan_lock = Lock()
+        self.scan_mode = settings.get("scan_mode", "folder")
+        if self.scan_mode not in ("folder", "file"):
+            raise ValueError("scan_mode must be folder or file")
+        self.controller = self._new_controller()
         self.discovery = None
         self.run_id = None
         self._presented_run_id = None
@@ -39,11 +46,19 @@ class ScannerApp:
         self.root.minsize(760, 600)
         frame = ttk.Frame(root, padding=12)
         frame.pack(fill="both", expand=True)
+        mode_controls = ttk.Frame(frame)
+        mode_controls.pack(fill="x", pady=(0, 6))
         controls = ttk.Frame(frame)
         controls.pack(fill="x", pady=(0, 10))
+        self.mode = tk.StringVar(value=self.scan_mode)
+        for label, value in (("Folder scan", "folder"), ("Large file scan", "file")):
+            ttk.Radiobutton(mode_controls, text=label, variable=self.mode, value=value,
+                            command=self.change_mode).pack(side="left", padx=(0, 8))
         ttk.Label(controls, text="Min size (MiB)").pack(side="left")
         self.minimum = tk.StringVar(value=bytes_to_mib(settings["min_size_bytes"]))
-        ttk.Entry(controls, textvariable=self.minimum, width=16).pack(side="left", padx=8)
+        self.minimum_entry = ttk.Entry(controls, textvariable=self.minimum, width=12)
+        self.minimum_entry.pack(side="left", padx=8)
+        self.minimum_entry.configure(state="normal" if self.scan_mode == "file" else "disabled")
         self.start_button = ttk.Button(controls, text="Scan / Restart", command=self.start, state="disabled")
         self.start_button.pack(side="left", padx=4)
         self.cancel_button = ttk.Button(controls, text="Cancel", command=self.cancel, state="disabled")
@@ -82,9 +97,13 @@ class ScannerApp:
         scope.columnconfigure(1, weight=1)
         ttk.Label(scope, text="Choose one local or USB folder. Exclusions: one path per line.").grid(
             row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
-        ttk.Label(frame, text="Folder sizes include matching files only.").pack(
-            fill="x", pady=(0, 6))
-        self.results = ResultTree(frame, on_open_folder=self.open_folder)
+        self.meaning = tk.StringVar(value=self._mode_description())
+        ttk.Label(frame, textvariable=self.meaning).pack(fill="x", pady=(0, 6))
+        self.result_host = ttk.Frame(frame)
+        self.result_host.pack(fill="both", expand=True)
+        self._trees = {"file": ResultTree(self.result_host, on_open_folder=self.open_folder),
+                       "folder": FolderTree(self.result_host, on_open_folder=self.open_folder)}
+        self.results = self._trees[self.scan_mode]
         self.results.pack(fill="both", expand=True)
         self.status = tk.StringVar(value="Checking drives…")
         self.current_path = tk.StringVar()
@@ -93,6 +112,37 @@ class ScannerApp:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.discover(initial=True)
         self._timer = self.root.after(self.update_ms, self._tick)
+
+    def _new_controller(self):
+        cls = FolderController if self.scan_mode == "folder" else ScanController
+        return cls(scan_lock=self._scan_lock)
+
+    def _mode_description(self):
+        if self.scan_mode == "folder":
+            return "All regular files; logical sizes. Aggregating until complete; cancelled/error totals are partial."
+        return "Folder sizes include matching files only."
+
+    def change_mode(self):
+        mode = self.mode.get()
+        if mode == self.scan_mode:
+            return
+        self.controller.close()
+        self.results.reset(None)
+        self.results.pack_forget()
+        self.scan_mode = mode
+        self.controller = self._new_controller()
+        self.run_id = self._presented_run_id = self._notified_run_id = None
+        if self._notification_timer is not None:
+            self.root.after_cancel(self._notification_timer)
+            self._notification_timer = None
+        self.results = self._trees[mode]
+        self.results.reset(None)
+        self.results.pack(fill="both", expand=True)
+        self.minimum_entry.configure(state="normal" if mode == "file" else "disabled")
+        self.meaning.set(self._mode_description())
+        self.current_path.set("")
+        self.cancel_button.configure(state="disabled")
+        self.status.set("Ready - press Scan / Restart.")
 
     @staticmethod
     def _lines(widget):
@@ -175,11 +225,13 @@ class ScannerApp:
             # A root may be a subdirectory of an allowed local volume, never an
             # explicitly rejected mount (network, virtual, alias).
             validate_roots(self.discovery, roots)
-            config = make_config(self.discovery, roots=roots, min_size_bytes=mib_to_bytes(self.minimum.get()),
+            config = make_config(self.discovery, roots=roots, min_size_bytes=mib_to_bytes(self.minimum.get()) if self.scan_mode == "file" else 0,
                                  excluded_paths=self._lines(self.excludes_text))
         except ValueError as exc:
             messagebox.showerror("Invalid settings", str(exc), parent=self.root)
             return
+        if self.scan_mode == "folder":
+            config = FolderConfig(config.roots, config.excluded_paths, config.boundary_paths)
         snapshot = self.controller.start(config)
         self.run_id = snapshot.run_id
         self._presented_run_id = None
@@ -213,8 +265,12 @@ class ScannerApp:
                     # finished is published only after the collector's final
                     # batch. Drain its remaining changes without rebuilding.
                     self._presented_run_id = snapshot.run_id
-            self.status.set(f"{state} | Files {progress.files_scanned:,} | Folders {progress.directories_scanned:,}"
-                            f" | Matches {progress.files_matched:,} | Errors {progress.errors:,}"
+            result_count = (f"Folders stored {snapshot.store.folder_count:,} | Bytes {progress.bytes_scanned:,}"
+                            if self.scan_mode == "folder" else f"Matches {progress.files_matched:,}")
+            if self.scan_mode == "folder" and snapshot.finished and snapshot.store.state == "partial":
+                state += " (partial totals)"
+            self.status.set(f"{state} | {self.scan_mode.title()} scan | Files {progress.files_scanned:,} | Folders {progress.directories_scanned:,}"
+                            f" | {result_count} | Errors {progress.errors:,}"
                             f" | {snapshot.elapsed_seconds:.1f}s")
             self.current_path.set(snapshot.error or progress.current_directory)
             if snapshot.finished and self._notified_run_id != snapshot.run_id:
@@ -226,15 +282,19 @@ class ScannerApp:
 
     def _notify_finished(self, snapshot):
         self._notification_timer = None
-        if self._closed or snapshot.run_id != self.run_id:
+        current = self.controller.snapshot()
+        if self._closed or snapshot.run_id != self.run_id or current is None or current.store is not snapshot.store:
             return
         if snapshot.error:
             messagebox.showerror("Scan failed", snapshot.error, parent=self.root)
             return
         summary = snapshot.summary
+        result_text = (f"Folders stored: {snapshot.store.folder_count:,}\nLogical bytes: {summary.bytes_scanned:,}\n"
+                       f"Totals: {snapshot.store.state}\n" if self.scan_mode == "folder"
+                       else f"Matches: {summary.files_matched:,}\n")
         messagebox.showinfo(
             "Scan complete",
-            f"Matches: {summary.files_matched:,}\n"
+            result_text +
             f"Files: {summary.files_scanned:,}\n"
             f"Errors: {summary.errors:,}\n"
             f"Time: {summary.elapsed_seconds:.1f}s", parent=self.root)
@@ -271,4 +331,6 @@ class ScannerApp:
         for timer in (self._timer, self._discover_timer, self._notification_timer):
             if timer:
                 self.root.after_cancel(timer)
+        for tree in self._trees.values():
+            tree.destroy()
         self.root.destroy()

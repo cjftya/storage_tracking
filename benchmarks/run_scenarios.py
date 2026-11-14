@@ -12,13 +12,29 @@ import time
 from storage_scanner.core.filters import bytes_to_mib
 
 
-def gui_measure(path, minimum):
+def gui_measure(path, minimum, scan_mode="file"):
     import tkinter as tk
     from storage_scanner.gui.app import ScannerApp
     from storage_scanner.platform_fs.metrics import peak_memory_bytes
+    from storage_scanner.core.results import MemoryResultStore
+    from storage_scanner.folder.results import FolderResultStore
+
+    store_type = MemoryResultStore if scan_mode == "file" else FolderResultStore
+    actual_add_batch = store_type.add_batch
+    collector_store_seconds = 0.0
+
+    def measured_add_batch(store, batch):
+        nonlocal collector_store_seconds
+        started = time.perf_counter()
+        try:
+            return actual_add_batch(store, batch)
+        finally:
+            collector_store_seconds += time.perf_counter() - started
+
+    store_type.add_batch = measured_add_batch
 
     root = tk.Tk()
-    settings = {"roots": (path,), "min_size_bytes": minimum, "extra_exclusions": (),
+    settings = {"scan_mode": scan_mode, "roots": (path,), "min_size_bytes": minimum, "extra_exclusions": (),
                 "include_removable": False, "use_default_exclusions": True, "update_ms": 1000}
     app = ScannerApp(root, settings, notify_on_completion=False)
     output = {}
@@ -68,8 +84,10 @@ def gui_measure(path, minimum):
                 output.update(gui_wall_seconds=time.perf_counter() - started,
                               tree_refresh_seconds=refresh_seconds,
                               tree_refresh_count=refresh_count,
+                              collector_store_seconds=collector_store_seconds,
                               max_heartbeat_gap_seconds=max_heartbeat_gap,
-                              stored_matches=snapshot.store.match_count,
+                              stored_matches=snapshot.store.match_count if scan_mode == "file" else None,
+                              stored_folders=snapshot.store.folder_count if scan_mode == "folder" else None,
                               rendered_nodes=len(app.results._paths),
                               peak_process_memory_bytes=peak_memory_bytes(), error=snapshot.error)
                 app.close()
@@ -77,7 +95,10 @@ def gui_measure(path, minimum):
         root.after(10, poll)
 
     root.after(10, poll)
-    root.mainloop()
+    try:
+        root.mainloop()
+    finally:
+        store_type.add_batch = actual_add_batch
     print(json.dumps(output, indent=2))
     return 1 if output.get("error") else 0
 
