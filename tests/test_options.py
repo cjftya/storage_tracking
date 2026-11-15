@@ -70,3 +70,17 @@ class OptionTests(unittest.TestCase):
                 self.assertEqual(load_settings(argument_parser("test").parse_args(args))["scan_mode"], expected)
                 self.assertEqual(load_settings(argument_parser("test").parse_args(
                     [*args, "--mode", "folder"]))["scan_mode"], "folder")
+
+    def test_no_default_excludes_keeps_mandatory_policy_and_auto_scope(self):
+        from storage_scanner.platform_fs.volumes import resolve_scope
+        root = str(Path.cwd())
+        system = str(Path(root) / 'system')
+        mandatory = str(Path(root) / 'mandatory')
+        discovery = Discovery((root, system, mandatory), (root, system, mandatory),
+                              (system,), (mandatory,))
+        self.assertEqual(resolve_scope(discovery).roots, (root,))
+        settings = load_settings(argument_parser('test').parse_args(['--no-default-excludes']))
+        with patch('storage_scanner.options.discover_volumes', return_value=discovery):
+            _, scope = configured_scope(settings)
+        self.assertEqual(scope.roots, (root, system))
+        self.assertEqual(scope.excluded_paths, (mandatory,))

@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from storage_scanner.core.filters import PathFilter
 from storage_scanner.core.models import FileMatch, ScanConfig, ScanProgress, ScanSummary
-from storage_scanner.platform_fs.paths import directory_is_link, path_key, root_metadata, entry_path_key
+from storage_scanner.platform_fs.paths import directory_is_link, path_key, validate_scan_roots, entry_path_key
 
 
 def scan(config: ScanConfig, on_batch: Callable[[tuple[FileMatch, ...]], None],
@@ -18,7 +18,7 @@ def scan(config: ScanConfig, on_batch: Callable[[tuple[FileMatch, ...]], None],
     current = ""
     batch = []
     cancelled = False
-    excluded = PathFilter(config.excluded_paths)
+    excluded = PathFilter(config.excluded_paths, allowed_paths=config.allowed_paths)
     roots = tuple(dict.fromkeys(path_key(p) for p in config.roots))
     boundaries = set(path_key(p) for p in config.boundary_paths) | set(roots)
     boundary_names = {}
@@ -36,19 +36,11 @@ def scan(config: ScanConfig, on_batch: Callable[[tuple[FileMatch, ...]], None],
             on_progress(ScanProgress(files, directories, matched, errors, current))
             last_progress = now
 
-    for root in roots:
+    inspected = validate_scan_roots(roots, excluded, directories_only=False)
+    for root, info in inspected:
         if should_cancel():
             cancelled = True
             break
-        if excluded.excludes(root):
-            continue
-        try:
-            info = root_metadata(root)
-            if info is None:
-                continue
-        except OSError:
-            errors += 1
-            continue
         if stat.S_ISREG(info.st_mode):
             # Linux bind mounts can expose a single file, not just a directory.
             current = os.path.dirname(root)
@@ -81,12 +73,15 @@ def scan(config: ScanConfig, on_batch: Callable[[tuple[FileMatch, ...]], None],
                             elif entry.is_file(follow_symlinks=False) and not (
                                     mounted_children and entry_path_key(entry.name) in mounted_children):
                                 info = entry.stat(follow_symlinks=False)
-                                files += 1
-                                if info.st_size >= config.min_size_bytes and not excluded.excludes_file_entry(entry.path):
-                                    matched += 1
-                                    batch.append(FileMatch(entry.path, info.st_size))
-                                    if len(batch) >= config.batch_size:
-                                        publish(time.perf_counter())
+                                if stat.S_ISREG(info.st_mode):
+                                    files += 1
+                                    if info.st_size >= config.min_size_bytes and not excluded.excludes_file_entry(entry.path):
+                                        matched += 1
+                                        batch.append(FileMatch(entry.path, info.st_size))
+                                        if len(batch) >= config.batch_size:
+                                            publish(time.perf_counter())
+                                else:
+                                    errors += 1  # Entry changed type after enumeration.
                         except OSError:
                             errors += 1
                         if index % config.cancellation_check_interval == 0:

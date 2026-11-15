@@ -65,9 +65,16 @@ def is_removable(mount: Mount) -> bool:
     return False
 
 
+def is_runtime_storage(mount: Mount) -> bool:
+    # Only confirmed local storage below the conventional runtime media tree.
+    return contains_path("/run/media", mount.path, windows=False) and is_local(mount)
+
+
 def select_mounts(mounts, include_removable=False, removable_check=is_removable):
     candidates = [m for m in mounts if is_local(m) and
-                  not any(contains_path(p, m.path, windows=False) for p in MANDATORY_EXCLUSIONS) and
+                  not any(contains_path(p, m.path, windows=False) and
+                          not (p == "/run" and is_runtime_storage(m))
+                          for p in MANDATORY_EXCLUSIONS) and
                   (include_removable or not removable_check(m))]
     # A bind alias of an already selected device subtree adds no new data.
     selected = []

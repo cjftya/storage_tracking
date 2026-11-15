@@ -69,3 +69,32 @@ class LinuxIntegrationTests(unittest.TestCase):
         self.assertTrue(discovery.roots)
         self.assertIn("/proc", discovery.mandatory_exclusions)
         validate_roots(discovery, (str(self.root),))
+
+    def test_mock_runtime_usb_scope_and_exclusions_agree(self):
+        from unittest.mock import patch, mock_open
+        from storage_scanner.platform_fs.filters import PathFilter
+        from storage_scanner.platform_fs.volumes import resolve_scope, make_config
+        text = ('1 0 8:1 / / rw - ext4 /dev/sda1 rw\n'
+                '2 1 0:2 / /run rw - tmpfs tmpfs rw\n'
+                '3 2 8:9 / /run/media/user/USB rw - exfat /dev/sdz1 rw\n'
+                '4 3 0:3 / /run/media/user/USB/network rw - nfs4 host:/share rw\n'
+                '5 2 0:4 / /run/media/user/virtual rw - tmpfs tmpfs rw')
+        with patch('builtins.open', mock_open(read_data=text)):
+            discovery = discover_volumes(True)
+        usb = '/run/media/user/USB'
+        validate_roots(discovery, (usb + '/data',))
+        for bad in (usb + '/network', '/run/media/user/virtual'):
+            with self.assertRaises(ValueError):
+                validate_roots(discovery, (bad,))
+        for exclusions in (None, (), (usb + '/private',)):
+            scope = resolve_scope(discovery, roots=(usb,), excluded_paths=exclusions)
+            policy = PathFilter(scope.excluded_paths, allowed_paths=scope.allowed_paths)
+            self.assertFalse(policy.excludes(usb + '/data'))
+            self.assertTrue(policy.excludes('/run'))
+            self.assertTrue(policy.excludes('/run/private'))
+            if exclusions:
+                self.assertTrue(policy.excludes(usb + '/private'))
+            config = make_config(discovery, roots=(usb,), excluded_paths=exclusions)
+            self.assertEqual(config.allowed_paths, (usb,))
+        scope = resolve_scope(discovery, roots=(usb,), excluded_paths=(usb,))
+        self.assertTrue(PathFilter(scope.excluded_paths, allowed_paths=scope.allowed_paths).excludes(usb))

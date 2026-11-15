@@ -10,6 +10,7 @@ class FolderConfig:
     flush_interval: float = 0.25
     progress_interval: float = 0.2
     cancellation_check_interval: int = 128
+    allowed_paths: tuple[str, ...] = ()
 
     def __post_init__(self):
         if not 256 <= self.batch_size <= 1024:

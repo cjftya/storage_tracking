@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from storage_scanner.platform_fs.filters import PathFilter
 from storage_scanner.folder.models import DirectoryDelta, FolderConfig, FolderProgress, FolderSummary
-from storage_scanner.platform_fs.paths import directory_is_link, path_key, root_metadata, entry_path_key
+from storage_scanner.platform_fs.paths import directory_is_link, path_key, validate_scan_roots, entry_path_key
 
 
 def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], None],
@@ -18,7 +18,7 @@ def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], 
     current = ""
     batch = []
     cancelled = False
-    excluded = PathFilter(config.excluded_paths)
+    excluded = PathFilter(config.excluded_paths, allowed_paths=config.allowed_paths)
     roots = tuple(dict.fromkeys(path_key(p) for p in config.roots))
     boundaries = set(path_key(p) for p in config.boundary_paths) | set(roots)
     boundary_names = {}
@@ -36,22 +36,11 @@ def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], 
             on_progress(FolderProgress(files, directories, total_bytes, errors, current))
             last_progress = now
 
-    for root in roots:
+    inspected = validate_scan_roots(roots, excluded, directories_only=True)
+    for root, info in inspected:
         if should_cancel():
             cancelled = True
             break
-        if excluded.excludes(root):
-            continue
-        try:
-            info = root_metadata(root)
-            if info is None:
-                continue
-        except OSError:
-            errors += 1
-            continue
-        if not stat.S_ISDIR(info.st_mode):
-            errors += 1  # Folder mode requires directory roots, including bind mounts.
-            continue
         stack = [root]
         while stack:
             if should_cancel():
