@@ -230,7 +230,7 @@ class GuiTests(unittest.TestCase):
         opened = []
         self.view.on_open_folder = opened.append
         self.view.reset(store)
-        self.root.update()
+        self.wait_until(lambda: folder in self.view._items)
         item = self.view._items[folder]
         event = SimpleNamespace(type=SimpleNamespace(name="ButtonPress"), y=10, x_root=20, y_root=30)
         with patch.object(self.view.tree, "identify_row", return_value=item), patch.object(
