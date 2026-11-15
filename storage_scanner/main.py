@@ -9,6 +9,8 @@ def main(argv=None):
         settings = load_settings(args)
         import tkinter as tk
         from storage_scanner.gui.app import ScannerApp
+        from storage_scanner.gui.icon import set_process_identity
+        set_process_identity()
         root = tk.Tk()
         try:
             ScannerApp(root, settings)

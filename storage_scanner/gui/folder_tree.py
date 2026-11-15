@@ -28,6 +28,7 @@ class FolderTree(ttk.Frame):
         self._context_path = None
         self.menu = Menu(self, tearoff=False)
         self.menu.add_command(label="Open folder", command=self._open_context_folder)
+        self.menu.add_command(label="Copy path", command=self._copy_context_path)
         ttk.Style(self).configure("Results.Treeview", rowheight=24, foreground="#202020",
                                   background=self.ROW_COLORS[0], fieldbackground=self.ROW_COLORS[0])
         self.vertical = ttk.Scrollbar(self, orient="vertical")
@@ -38,6 +39,13 @@ class FolderTree(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.tree = None
         self.reset(None)
+
+    def apply_palette(self, palette):
+        self.ROW_COLORS = (palette["card"], palette["stripe"])
+        for tag, color in zip(self.ROW_TAGS, self.ROW_COLORS):
+            self.tree.tag_configure(tag, background=color)
+        self.menu.configure(background=palette["card"], foreground=palette["text"],
+                            activebackground=palette["accent"], activeforeground="#ffffff")
 
     def _create_tree(self):
         self.tree = ttk.Treeview(self, columns=("size", "bytes"), selectmode="browse", style="Results.Treeview")
@@ -69,6 +77,7 @@ class FolderTree(ttk.Frame):
         self._sorted = False
         self._sort_paths = None
         self.run_id = run_id
+        self._expand_root_pending = False
         if self._render_timer is not None:
             self.after_cancel(self._render_timer)
             self._render_timer = None
@@ -132,6 +141,7 @@ class FolderTree(ttk.Frame):
             return
         self._render_timer = None
         self.refresh()
+        self._try_expand_root()
         self._schedule_render()
 
     def destroy(self):
@@ -203,18 +213,24 @@ class FolderTree(ttk.Frame):
             item = self.tree.identify_row(event.y)
             x, y = event.x_root, event.y_root
         path = self._paths.get(item)
-        if path not in self._directories or self.on_open_folder is None:
+        if path is None:
             self._context_path = None
             self.menu.unpost()
             return
         self.tree.selection_set(item)
         self.tree.focus(item)
         self._context_path = path
+        self.menu.entryconfigure(0, state="normal" if path in self._directories and self.on_open_folder else "disabled")
         try:
             self.menu.tk_popup(x, y)
         finally:
             self.menu.grab_release()
         return "break"
+
+    def _copy_context_path(self):
+        if self._context_path is not None and self._context_path in self._paths.values():
+            self.clipboard_clear()
+            self.clipboard_append(self._context_path)
 
     def _open_context_folder(self):
         if self._context_path in self._directories and self.on_open_folder is not None:
@@ -225,6 +241,28 @@ class FolderTree(ttk.Frame):
             self._pending.append(path)
             self._queued.add(path)
         self._schedule_render()
+
+    def expand_root(self):
+        """Request one level of expansion, even if the root is not rendered yet."""
+        self._expand_root_pending = True
+        self._try_expand_root()
+
+    def _try_expand_root(self):
+        if not self._expand_root_pending or self.store is None:
+            return
+        roots = self.store.children_page(None, 0, 1)[1]
+        if not roots or not roots[0].is_directory:
+            self._expand_root_pending = False
+            return
+        path = roots[0].path
+        item = self._items.get(path)
+        if item is None:
+            self._enqueue(None)
+            return
+        self._expand_root_pending = False
+        self.tree.item(item, open=True)
+        self._enqueue(path)
+        self._schedule_striping()
 
     def _open(self, event=None):
         if event is not None and getattr(event, "widget", self.tree) is not self.tree:

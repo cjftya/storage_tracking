@@ -39,9 +39,13 @@ def load_settings(args):
     mode = args.mode or data.get("scan_mode", "folder")
     if mode not in ("folder", "file"):
         raise ValueError("scan_mode must be folder or file")
+    theme = data.get("theme_mode", "system")
+    if theme not in ("system", "day", "night"):
+        raise ValueError("theme_mode must be system, day or night")
     roots = args.roots or data.get("roots")
     return {
         "scan_mode": mode,
+        "theme_mode": theme,
         "roots": tuple(path_key(p) for p in roots) if roots is not None else None,
         "min_size_bytes": mib_to_bytes(str(args.min_size_mib if args.min_size_mib is not None
                                             else data.get("min_size_mib", "100"))),

@@ -21,6 +21,31 @@ class ScanScope:
     boundary_paths: tuple[str, ...]
 
 
+def select_default_root(discovery, system_root, *, windows=None):
+    """Select only the confirmed system volume, never an arbitrary first disk."""
+    candidate = path_key(system_root, windows=windows)
+    return next((path_key(root, windows=windows) for root in discovery.roots
+                 if path_key(root, windows=windows) == candidate), None)
+
+
+def default_scan_root(discovery):
+    try:
+        if os.name == "nt":
+            from storage_scanner.platform_fs.windows import system_volume_root
+            candidate = system_volume_root()
+        elif sys.platform.startswith("linux"):
+            candidate = "/"
+        else:
+            return None
+        root = select_default_root(discovery, candidate)
+        if root is not None and os.path.isdir(root):
+            validate_roots(discovery, (root,))
+            return root
+    except (OSError, ValueError):
+        pass
+    return None
+
+
 def validate_roots(discovery: Discovery, roots):
     allowed = set(path_key(p) for p in discovery.roots)
     boundaries = set(path_key(p) for p in discovery.boundary_paths) | allowed

@@ -1,5 +1,6 @@
 {
   "scan_mode": "folder",
+  "theme_mode": "system",
   "min_size_mib": "100",
   "include_removable": false,
   "use_default_exclusions": true,

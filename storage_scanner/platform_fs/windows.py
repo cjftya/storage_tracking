@@ -9,6 +9,25 @@ DRIVE_REMOVABLE = 2
 DRIVE_FIXED = 3
 
 
+def system_volume_root():
+    """Ask Windows for its installation directory and owning volume mount."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    get_windows = kernel.GetWindowsDirectoryW
+    get_windows.argtypes = [ctypes.c_wchar_p, ctypes.c_uint]
+    get_windows.restype = ctypes.c_uint
+    get_volume = kernel.GetVolumePathNameW
+    get_volume.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint]
+    get_volume.restype = ctypes.c_int
+    directory = ctypes.create_unicode_buffer(32768)
+    size = get_windows(directory, len(directory))
+    if not size or size >= len(directory):
+        raise ctypes.WinError(ctypes.get_last_error())
+    volume = ctypes.create_unicode_buffer(32768)
+    if not get_volume(directory.value, volume, len(volume)):
+        raise ctypes.WinError(ctypes.get_last_error())
+    return volume.value
+
+
 def default_exclusions(roots):
     paths = [os.environ.get("SystemRoot", r"C:\Windows")]
     for root in roots:

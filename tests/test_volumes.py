@@ -57,3 +57,16 @@ class VolumeTests(unittest.TestCase):
         validate_roots(discovery, (os.path.join(local, "data"),))
         with self.assertRaises(ValueError):
             validate_roots(discovery, (os.path.join(network, "data"),))
+
+
+class DefaultRootTests(unittest.TestCase):
+    def test_windows_selects_confirmed_non_c_system_volume(self):
+        from storage_scanner.platform_fs.volumes import select_default_root
+        discovery = Discovery(("C:\\", "E:\\"), (), ())
+        self.assertEqual(select_default_root(discovery, "E:\\", windows=True), "e:\\")
+        self.assertIsNone(select_default_root(discovery, "D:\\", windows=True))
+
+    def test_linux_requires_allowed_root_mount(self):
+        from storage_scanner.platform_fs.volumes import select_default_root
+        self.assertEqual(select_default_root(Discovery(("/", "/home"), (), ()), "/", windows=False), "/")
+        self.assertIsNone(select_default_root(Discovery(("/home",), ("/",), ()), "/", windows=False))

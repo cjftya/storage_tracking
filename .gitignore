@@ -221,3 +221,6 @@ __marimo__/
 
 # Local benchmark runs; versioned measurements live in results/v1.*/.
 benchmarks/results/*.json
+
+# Local scan reports
+/reports/

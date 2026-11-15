@@ -52,8 +52,14 @@ class GuiTests(unittest.TestCase):
             settings.pop("scan_mode")
         app = ScannerApp(self.root, settings)
 
+        report_temp = tempfile.TemporaryDirectory(dir=Path.cwd())
+        self.addCleanup(report_temp.cleanup)
+        app.report_directory = Path(report_temp.name)
+
         def cleanup():
             app.controller.close()
+            for worker in app._report_workers:
+                worker.join(timeout=5)
             for timer in (app._timer, app._discover_timer, app._notification_timer):
                 if timer:
                     self.root.after_cancel(timer)
@@ -113,6 +119,7 @@ class GuiTests(unittest.TestCase):
             app = self.make_app(directory)
             end = time.perf_counter() + 10
             app.start()
+            self.assertEqual(app.scan_activity.get(), "Scanning...")
             old_id = app.run_id
             app.cancel()
             app.start()
@@ -125,7 +132,10 @@ class GuiTests(unittest.TestCase):
                 time.sleep(0.002)
             self.assertTrue(result.finished)
             self.assertEqual(result.store.match_count, 1)
+            self.assertEqual(app.scan_activity.get(), "Completed")
             self.assertIn("Matches 1", app.status.get())
+            self.wait_until(lambda: str(app.report_button["state"]) == "normal")
+            self.assertEqual(len(list(app.report_directory.glob("*.md"))), 1)
             self.assertEqual(self.showinfo.call_count, 1)
             self.assertFalse(self.errors)
 
@@ -240,15 +250,22 @@ class GuiTests(unittest.TestCase):
         self.assertEqual(self.view.tree.selection(), (item,))
         self.view.menu.invoke(0)
         self.assertEqual(opened, [folder])
+        self.view.menu.invoke(1)
+        self.assertEqual(self.root.clipboard_get(), folder)
         self.view.tree.item(item, open=True)
         self.view.tree.focus(item)
         self.view._open()
         self.root.update()
-        file_item = self.view.tree.get_children(item)[0]
+        file_path = path_key(str(Path(folder) / "file.bin"))
+        self.wait_until(lambda: file_path in self.view._paths.values())
+        file_item = next(key for key, value in self.view._paths.items() if value == file_path)
         with patch.object(self.view.tree, "identify_row", return_value=file_item), patch.object(
                 self.view.menu, "tk_popup") as popup:
             self.view._show_context_menu(event)
-            popup.assert_not_called()
+            popup.assert_called_once()
+        self.assertEqual(str(self.view.menu.entrycget(0, "state")), "disabled")
+        self.view.menu.invoke(1)
+        self.assertEqual(self.root.clipboard_get(), path_key(str(Path(folder) / "file.bin")))
         self.view.reset(None)
         self.view._open_context_folder()
         self.assertEqual(opened, [folder])
@@ -445,7 +462,8 @@ class GuiTests(unittest.TestCase):
         self.assertFalse(self.errors)
 
     def test_folder_picker_replaces_single_scope_and_clears_it(self):
-        app = self.make_app()
+        with patch("storage_scanner.gui.app.default_scan_root", return_value=None):
+            app = self.make_app()
         self.assertEqual(app.roots_list.size(), 0)
         self.assertEqual(str(app.start_button["state"]), "disabled")
         self.assertIsNone(app.controller.snapshot())
@@ -595,3 +613,71 @@ class GuiTests(unittest.TestCase):
         self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[0], "background")), "#f5f5f5")
         self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[1], "background")), "#e8e8e8")
         self.assertFalse(self.errors)
+
+    def test_default_location_is_selected_without_scanning_and_clear_survives_refresh(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            default = path_key(directory)
+            with patch("storage_scanner.gui.app.default_scan_root", return_value=default):
+                app = self.make_app()
+            self.assertEqual(app.roots_list.get(0, "end"), (default,))
+            self.assertIsNone(app.controller.snapshot())
+            self.assertEqual(str(app.start_button["state"]), "normal")
+            self.root.deiconify()
+            self.root.update()
+            self.assertGreater(app.roots_list.winfo_width(), 700)
+            app.remove_folders()
+            app.discover()
+            self.wait_until(lambda: app._discover_timer is None)
+            self.assertEqual(app.roots_list.size(), 0)
+            self.assertFalse(self.errors)
+
+    def test_report_directory_picker_controls_export_and_cancel_preserves_choice(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            source = Path(directory) / "source"
+            source.mkdir()
+            (source / "file.bin").write_bytes(b"abc")
+            target = Path(directory) / "chosen-reports"
+            target.mkdir()
+            app = self.make_app(str(source), minimum=0)
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=str(target)):
+                app.choose_report_directory()
+            self.assertEqual(app.report_directory, target.resolve())
+            with patch("storage_scanner.gui.app.filedialog.askdirectory", return_value=""):
+                app.choose_report_directory()
+            self.assertEqual(app.report_directory, target.resolve())
+            app.start()
+            self.wait_until(lambda: str(app.report_button["state"]) == "normal")
+            reports = list(target.glob("*.md"))
+            self.assertEqual(len(reports), 1)
+            self.assertEqual(app._last_report_path, reports[0])
+            self.assertIn("Status: complete", reports[0].read_text(encoding="utf-8"))
+            self.assertEqual((self.root._app_icon.width(), self.root._app_icon.height()), (192, 192))
+            self.assertFalse(self.errors)
+
+    def test_completion_expands_only_the_root_in_both_modes(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            child = Path(directory) / "child"
+            grandchild = child / "grandchild"
+            grandchild.mkdir(parents=True)
+            (grandchild / "file.bin").write_bytes(b"abc")
+            app = self.make_app(directory, minimum=0)
+            for mode in ("file", "folder"):
+                with self.subTest(mode=mode):
+                    app.mode.set(mode)
+                    app.change_mode()
+                    app.start()
+                    root_path = path_key(directory)
+                    child_path = path_key(str(child))
+                    self.wait_until(lambda: child_path in app.results._items)
+                    root_item = app.results._items[root_path]
+                    child_item = app.results._items[child_path]
+                    self.assertTrue(app.results.tree.item(root_item, "open"))
+                    self.assertFalse(app.results.tree.item(child_item, "open"))
+                    self.assertNotIn(path_key(str(grandchild)), app.results._items)
+                    # A later status tick must respect a manual collapse.
+                    app.results.tree.item(root_item, open=False)
+                    self.root.after_cancel(app._timer)
+                    app._tick()
+                    self.root.update()
+                    self.assertFalse(app.results.tree.item(root_item, "open"))
+            self.assertFalse(self.errors)
