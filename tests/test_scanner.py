@@ -196,6 +196,8 @@ class ScannerTests(unittest.TestCase):
         self.file('good', 12)
         calls = []
         class Changed:
+            path = str(self.root / "changed")
+
             def __init__(self, mode=None):
                 self.mode = mode
             def is_dir(self, **kwargs):
