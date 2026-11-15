@@ -24,3 +24,7 @@ def set_window_icon(root):
     root._app_icon = tk.PhotoImage(master=root, data=base64.b64encode((ASSETS / "icon.png").read_bytes()))
     root._app_icons = [root._app_icon, *(root._app_icon.subsample(scale) for scale in (3, 6, 12))]
     root.iconphoto(True, *root._app_icons)
+
+
+# Preserve the public entry point introduced on main.
+apply_window_icon = set_window_icon

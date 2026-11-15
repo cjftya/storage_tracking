@@ -69,10 +69,12 @@ class FolderResultStore:
                     self._changes.add(key)
                     key = self._parents[key]
 
-    def finish(self, *, complete):
+    def finish(self, *, complete, should_stop=lambda: False):
         # Collector is the sole writer. Sort each child index outside the lock;
         # readers copy at most a page, and never wait on a whole-tree sort.
         for parent, keys in self._children.items():
+            if should_stop():
+                return
             ordered = sorted(keys, key=lambda key: (-self._nodes[key].size_bytes, key))
             with self._lock:
                 self._children[parent] = ordered

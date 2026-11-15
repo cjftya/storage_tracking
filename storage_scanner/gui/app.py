@@ -18,6 +18,7 @@ from storage_scanner.folder.models import FolderConfig
 from storage_scanner.options import configured_scope
 from storage_scanner.platform_fs.actions import open_folder
 from storage_scanner.platform_fs.paths import path_key
+from storage_scanner.platform_fs.filters import PathFilter
 from storage_scanner.platform_fs.volumes import resolve_scope, validate_roots, default_scan_root
 
 
@@ -305,10 +306,14 @@ class ScannerApp:
             scope = resolve_scope(self.discovery, roots=roots,
                                   excluded_paths=self._lines(self.excludes_text))
             if self.scan_mode == "folder":
-                config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths)
+                config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths,
+                                      allowed_paths=scope.allowed_paths)
             else:
                 config = ScanConfig(scope.roots, mib_to_bytes(self.minimum.get()),
-                                    scope.excluded_paths, scope.boundary_paths)
+                                    scope.excluded_paths, scope.boundary_paths,
+                                      allowed_paths=scope.allowed_paths)
+            if PathFilter(scope.excluded_paths, allowed_paths=scope.allowed_paths).excludes(roots[0]):
+                raise ValueError(f"Scan root is excluded by path policy: {roots[0]}")
         except ValueError as exc:
             messagebox.showerror("Invalid settings", str(exc), parent=self.root)
             return

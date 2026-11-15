@@ -64,9 +64,8 @@ class FolderTests(unittest.TestCase):
                                       boundary_paths=(str(boundary),))
         self.assertEqual(summary.bytes_scanned, 7)
         self.assertIsNone(store.node(path_key(str(excluded))))
-        summary, store = self.collect(excluded_paths=(str(self.root),))
-        self.assertEqual(store.children(None)[0].size_bytes, 0)
-        self.assertEqual(summary.files_scanned, 0)
+        with self.assertRaisesRegex(ValueError, "excluded"):
+            self.collect(excluded_paths=(str(self.root),))
 
     def test_many_files_store_only_folders_and_bounded_batches(self):
         for i in range(2000):
@@ -172,9 +171,8 @@ class FolderTests(unittest.TestCase):
 
     def test_file_root_reports_error_instead_of_a_completed_zero_total(self):
         file = self.file("file", 10)
-        result = scan(FolderConfig((str(file),)), lambda batch: None)
-        self.assertEqual(result.errors, 1)
-        self.assertEqual(result.bytes_scanned, 0)
+        with self.assertRaisesRegex(ValueError, "root type"):
+            scan(FolderConfig((str(file),)), lambda batch: None)
 
     def test_file_becoming_directory_is_not_counted_as_file_bytes(self):
         import stat
@@ -281,9 +279,13 @@ class FolderControllerTests(unittest.TestCase):
                 batch((DirectoryDelta(str(Path.cwd()), 1),))
             return FolderSummary(30, 1, 30, 0, .1, False)
         with patch("storage_scanner.folder.controller.scan", side_effect=fake), patch.object(
-                FolderResultStore, "add_batch", side_effect=MemoryError("full")):
+                FolderResultStore, "add_batch", side_effect=MemoryError("full")) as add_batch:
             controller.start(config)
-            self.assertIn("Result collector", self.wait(controller).error)
+            result = self.wait(controller)
+            self.assertIn("Result collector", result.error)
+            self.assertEqual(result.store.state, "partial")
+            self.assertTrue(result.store.finalized)
+            self.assertEqual(add_batch.call_count, 1)
         self.assertTrue(controller._scan_lock.acquire(blocking=False))
         controller._scan_lock.release()
 
@@ -313,3 +315,48 @@ class FolderControllerTests(unittest.TestCase):
         self.assertEqual(result.store.node(path_key(root)).size_bytes, 50)
         self.assertEqual(first.store.node(path_key(root)).size_bytes, 0)
         self.assertTrue(result.store.finalized)
+
+    def test_superseded_run_skips_sort_and_cancelled_run_sorts_partial(self):
+        root = str(Path.cwd())
+        for restart in (False, True):
+            with self.subTest(restart=restart):
+                controller = FolderController()
+                self.addCleanup(controller.close)
+                started, release = Event(), Event()
+                calls = []
+                def fake(config, batch, progress, cancel):
+                    if not calls:
+                        calls.append(True)
+                        batch((DirectoryDelta(str(Path(root) / 'small'), 1),
+                               DirectoryDelta(str(Path(root) / 'large'), 20)))
+                        started.set()
+                        self.assertTrue(release.wait(3))
+                    return FolderSummary(2, 3, 21, 0, .1, cancel())
+                with patch('storage_scanner.folder.controller.scan', side_effect=fake):
+                    controller.start(FolderConfig((root,)))
+                    old = controller._run
+                    self.assertTrue(started.wait(2))
+                    if restart:
+                        controller.start(FolderConfig((root,)))
+                    else:
+                        controller.cancel()
+                    release.set()
+                    result = self.wait(controller)
+                    deadline = time.perf_counter() + 3
+                    while not old.finished and time.perf_counter() < deadline:
+                        time.sleep(.002)
+                self.assertTrue(old.finished)
+                self.assertIsNone(result.error)
+                self.assertEqual(old.store.finalized, not restart)
+                if not restart:
+                    self.assertEqual(old.store.state, 'partial')
+                    self.assertEqual([n.size_bytes for n in old.store.children(path_key(root))], [20, 1])
+                self.assertTrue(controller._scan_lock.acquire(blocking=False))
+                controller._scan_lock.release()
+
+    def test_finish_stops_before_sorting_superseded_store(self):
+        store = FolderResultStore((str(Path.cwd()),))
+        with patch('storage_scanner.folder.results.sorted', create=True,
+                   side_effect=AssertionError('Obsolete sort')):
+            store.finish(complete=False, should_stop=lambda: True)
+        self.assertFalse(store.finalized)

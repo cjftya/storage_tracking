@@ -71,4 +71,5 @@ def configured_scan(settings):
     from storage_scanner.core.models import ScanConfig
     discovery, scope = configured_scope(settings)
     return discovery, ScanConfig(scope.roots, settings["min_size_bytes"],
-                                 scope.excluded_paths, scope.boundary_paths)
+                                 scope.excluded_paths, scope.boundary_paths,
+                                      allowed_paths=scope.allowed_paths)

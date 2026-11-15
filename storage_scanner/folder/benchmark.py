@@ -22,7 +22,8 @@ def main(argv=None):
     try:
         settings = load_settings(args)
         _, scope = configured_scope(settings)
-        config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths)
+        config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths,
+                              allowed_paths=scope.allowed_paths)
         stop = Event()
         previous = signal.signal(signal.SIGINT, lambda signum, frame: stop.set())
         store = FolderResultStore(config.roots) if args.store else None
