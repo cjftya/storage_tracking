@@ -11,6 +11,7 @@ class Discovery:
     boundary_paths: tuple[str, ...]
     default_exclusions: tuple[str, ...]
     mandatory_exclusions: tuple[str, ...] = ()
+    allowed_paths: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,6 +20,7 @@ class ScanScope:
     roots: tuple[str, ...]
     excluded_paths: tuple[str, ...]
     boundary_paths: tuple[str, ...]
+    allowed_paths: tuple[str, ...] = ()
 
 
 def validate_roots(discovery: Discovery, roots):
@@ -38,20 +40,25 @@ def discover_volumes(include_removable: bool = False) -> Discovery:
         roots = select_volumes(candidates, include_removable)
         return Discovery(roots, tuple(c[0] for c in candidates), default_exclusions(roots))
     if sys.platform.startswith("linux"):
-        from storage_scanner.platform_fs.linux import parse_mountinfo, select_mounts, DEFAULT_EXCLUSIONS, MANDATORY_EXCLUSIONS
+        from storage_scanner.platform_fs.linux import parse_mountinfo, select_mounts, DEFAULT_EXCLUSIONS, MANDATORY_EXCLUSIONS, is_runtime_storage
         with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as handle:
             mounts = parse_mountinfo(handle.read())
         selected = select_mounts(mounts, include_removable)
         return Discovery(tuple(m.path for m in selected), tuple(m.path for m in mounts),
-                         DEFAULT_EXCLUSIONS, MANDATORY_EXCLUSIONS)
+                         DEFAULT_EXCLUSIONS, MANDATORY_EXCLUSIONS,
+                         tuple(m.path for m in selected if is_runtime_storage(m)))
     raise RuntimeError("Only Windows and Linux are supported")
 
 
 def resolve_scope(discovery: Discovery, *, roots=None, excluded_paths=None) -> ScanScope:
     exclusions = discovery.default_exclusions if excluded_paths is None else tuple(excluded_paths)
-    return ScanScope(tuple(discovery.roots if roots is None else roots),
-                     tuple(dict.fromkeys((*discovery.mandatory_exclusions, *exclusions))),
-                     discovery.boundary_paths)
+    exclusions = tuple(dict.fromkeys((*discovery.mandatory_exclusions, *exclusions)))
+    if roots is None:
+        # Discovery is automatic: optional exclusions still suppress system roots.
+        from storage_scanner.platform_fs.filters import PathFilter
+        policy = PathFilter(exclusions, allowed_paths=discovery.allowed_paths)
+        roots = tuple(root for root in discovery.roots if not policy.excludes(root))
+    return ScanScope(tuple(roots), exclusions, discovery.boundary_paths, discovery.allowed_paths)
 
 
 def make_config(discovery: Discovery, *, roots=None, min_size_bytes=100 * 1024 * 1024,
@@ -59,4 +66,5 @@ def make_config(discovery: Discovery, *, roots=None, min_size_bytes=100 * 1024 *
     """Compatibility factory for the public file-scanner API."""
     from storage_scanner.core.models import ScanConfig
     scope = resolve_scope(discovery, roots=roots, excluded_paths=excluded_paths)
-    return ScanConfig(scope.roots, min_size_bytes, scope.excluded_paths, scope.boundary_paths)
+    return ScanConfig(scope.roots, min_size_bytes, scope.excluded_paths, scope.boundary_paths,
+                      allowed_paths=scope.allowed_paths)

@@ -1,4 +1,4 @@
-name: Linux tests
+name: Windows and Linux tests
 
 on:
   push:
@@ -30,3 +30,24 @@ jobs:
         run: xvfb-run -a /usr/bin/python3 -m unittest discover -s tests -v
       - name: Compile Python sources
         run: /usr/bin/python3 -m compileall -q storage_scanner tests benchmarks
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Require a working Tk display
+        run: |
+          python --version
+          python -c "import tkinter as tk; root = tk.Tk(); print('Tk', root.tk.call('info', 'patchlevel')); root.destroy()"
+      - name: Run full suite with real Windows Tk widgets
+        run: python -m unittest discover -s tests -v
+      - name: Compile Python sources
+        run: python -m compileall -q storage_scanner tests benchmarks

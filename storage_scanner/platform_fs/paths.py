@@ -58,3 +58,27 @@ def root_metadata(path: str):
 def root_is_directory(path: str) -> bool:
     info = root_metadata(path)
     return info is not None and stat.S_ISDIR(info.st_mode)
+
+
+def validate_scan_roots(roots, excluded, *, directories_only=False):
+    """Fail before publishing results; root failures are not traversal errors."""
+    if not roots:
+        raise ValueError("No scan roots selected")
+    inspected = []
+    for root in roots:
+        if excluded.excludes(root):
+            raise ValueError(f"Scan root is excluded by path policy: {root}")
+        try:
+            info = root_metadata(root)
+            if info is None:
+                raise ValueError(f"Unsupported symbolic link, junction or reparse scan root: {root}")
+            if stat.S_ISDIR(info.st_mode):
+                # Open only: no entries or file contents are read during preflight.
+                with os.scandir(root):
+                    pass
+            elif directories_only or not stat.S_ISREG(info.st_mode):
+                raise ValueError(f"Unsupported scan root type: {root}")
+        except OSError as exc:
+            raise ValueError(f"Cannot access scan root {root}: {exc}") from exc
+        inspected.append((root, info))
+    return tuple(inspected)

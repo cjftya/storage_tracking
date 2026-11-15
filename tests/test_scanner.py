@@ -119,8 +119,8 @@ class ScannerTests(unittest.TestCase):
 
         matches = []
         with patch("storage_scanner.core.scanner.os.scandir", side_effect=scandir):
-            result = scan(ScanConfig((str(self.root), str(self.root / "missing")), 0), matches.extend)
-        self.assertEqual(result.errors, 2)
+            result = scan(ScanConfig((str(self.root),), 0), matches.extend)
+        self.assertEqual(result.errors, 1)
         self.assertEqual(len(matches), 1)
 
     def test_deleted_entry_race_does_not_abort_directory(self):
@@ -188,3 +188,35 @@ class ScannerTests(unittest.TestCase):
                            batches.append, should_cancel=lambda: bool(batches))
         self.assertTrue(summary.cancelled)
         self.assertEqual(len(batches[0]), 1)
+
+    def test_stat_type_changes_and_denial_do_not_hide_good_files(self):
+        import stat
+        from types import SimpleNamespace
+        real_scandir = os.scandir
+        self.file('good', 12)
+        calls = []
+        class Changed:
+            def __init__(self, mode=None):
+                self.mode = mode
+            def is_dir(self, **kwargs):
+                return False
+            def is_file(self, **kwargs):
+                return True
+            def stat(self, **kwargs):
+                calls.append(self.mode)
+                if self.mode is None:
+                    raise PermissionError('denied')
+                return SimpleNamespace(st_mode=self.mode, st_size=4096)
+        class Entries:
+            def __enter__(inner):
+                inner.actual = real_scandir(self.root)
+                return iter([Changed(stat.S_IFDIR), Changed(stat.S_IFLNK),
+                             Changed(stat.S_IFIFO), Changed(), *inner.actual])
+            def __exit__(inner, *args):
+                inner.actual.close()
+        with patch('storage_scanner.core.scanner.os.scandir', return_value=Entries()):
+            summary, matches = self.run_scan(min_size_bytes=0)
+        self.assertEqual(len(calls), 4)  # One stat per enumerated entry.
+        self.assertEqual(summary.errors, 4)
+        self.assertEqual(summary.files_scanned, 1)
+        self.assertEqual([m.size_bytes for m in matches], [12])

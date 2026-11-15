@@ -79,7 +79,7 @@ class FolderController:
         acquired = False
 
         def deliver(batch):
-            while not run.superseded.is_set():
+            while not run.superseded.is_set() and not run.error:
                 try:
                     run.queue.put(batch, timeout=0.05)
                     return
@@ -112,20 +112,22 @@ class FolderController:
 
     @staticmethod
     def _collect(run):
+        collector_failed = False
         while True:
             batch = run.queue.get()
             if batch is None:
                 break
-            if not run.superseded.is_set():
+            if not run.superseded.is_set() and not collector_failed:
                 try:
                     run.store.add_batch(batch)
                 except Exception as exc:
+                    collector_failed = True
                     with run.lock:
                         run.error = f"Result collector: {type(exc).__name__}: {exc}"
                     run.cancel.set()
-                    run.superseded.set()
         try:
-            run.store.finish(complete=not run.error and run.summary is not None
+            run.store.finish(should_stop=run.superseded.is_set,
+                             complete=not run.error and run.summary is not None
                              and not run.summary.cancelled and not run.summary.errors)
         except Exception as exc:
             with run.lock:

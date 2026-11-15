@@ -595,3 +595,13 @@ class GuiTests(unittest.TestCase):
         self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[0], "background")), "#f5f5f5")
         self.assertEqual(str(self.view.tree.tag_configure(self.view.ROW_TAGS[1], "background")), "#e8e8e8")
         self.assertFalse(self.errors)
+
+    def test_excluded_root_reports_reason_without_starting_scan(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            app = self.make_app(directory)
+            app.excludes_text.insert('end', '\n' + directory)
+            with patch.object(app.controller, 'start') as start:
+                app.start()
+            start.assert_not_called()
+            self.showerror.assert_called_once()
+            self.assertIn('excluded', self.showerror.call_args.args[1])

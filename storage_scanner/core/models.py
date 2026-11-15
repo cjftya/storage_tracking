@@ -11,6 +11,7 @@ class ScanConfig:
     flush_interval: float = 0.25
     progress_interval: float = 0.2
     cancellation_check_interval: int = 128
+    allowed_paths: tuple[str, ...] = ()
 
     def __post_init__(self):
         if not isinstance(self.min_size_bytes, int) or self.min_size_bytes < 0:

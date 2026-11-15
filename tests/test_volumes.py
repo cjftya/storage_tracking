@@ -57,3 +57,16 @@ class VolumeTests(unittest.TestCase):
         validate_roots(discovery, (os.path.join(local, "data"),))
         with self.assertRaises(ValueError):
             validate_roots(discovery, (os.path.join(network, "data"),))
+
+    def test_runtime_media_only_confirmed_local_mounts_and_deduplication(self):
+        local = Mount('/run/media/user/USB', 'exfat', '8:9', '/', '/dev/sdz1')
+        mounts = (Mount('/', 'ext4', '8:1', '/', '/dev/sda1'), local,
+                  Mount('/run/media/user/alias', 'exfat', '8:9', '/', '/dev/sdz1'),
+                  Mount('/run/media/user/network', 'nfs4', '0:2', '/', 'host:/data'),
+                  Mount('/run/media/user/virtual', 'tmpfs', '0:3', '/', 'tmpfs'),
+                  Mount('/run/private', 'ext4', '8:8', '/', '/dev/sdy1'))
+        check = lambda m: m.device == '8:9'
+        self.assertEqual([m.path for m in select_mounts(mounts, removable_check=check)], ['/'])
+        selected = select_mounts(mounts, True, check)
+        self.assertEqual(len(selected), 2)
+        self.assertEqual(sum(m.device == '8:9' for m in selected), 1)
