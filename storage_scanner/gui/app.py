@@ -311,7 +311,7 @@ class ScannerApp:
             else:
                 config = ScanConfig(scope.roots, mib_to_bytes(self.minimum.get()),
                                     scope.excluded_paths, scope.boundary_paths,
-                                      allowed_paths=scope.allowed_paths)
+                                    allowed_paths=scope.allowed_paths)
             if PathFilter(scope.excluded_paths, allowed_paths=scope.allowed_paths).excludes(roots[0]):
                 raise ValueError(f"Scan root is excluded by path policy: {roots[0]}")
         except ValueError as exc:
@@ -354,6 +354,7 @@ class ScannerApp:
             if snapshot.finished:
                 self.cancel_button.configure(state="disabled")
                 state = "Failed" if snapshot.error else "Cancelled" if snapshot.summary.cancelled else "Completed"
+                self.scan_activity.set(state)
                 if self._presented_run_id != snapshot.run_id:
                     # finished is published only after the collector's final
                     # batch. Drain its remaining changes without rebuilding.
@@ -361,8 +362,6 @@ class ScannerApp:
                     if not snapshot.error and not snapshot.summary.cancelled:
                         self.results.expand_root()
                     self._start_report(snapshot)
-            if snapshot.finished:
-                self.scan_activity.set(state)
             result_count = (f"Folders stored {snapshot.store.folder_count:,} | Bytes {progress.bytes_scanned:,}"
                             if self.scan_mode == "folder" else f"Matches {progress.files_matched:,}")
             if self.scan_mode == "folder" and snapshot.finished and snapshot.store.state == "partial":

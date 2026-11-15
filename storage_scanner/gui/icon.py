@@ -1,6 +1,6 @@
 """Bundled application identity and window icons; no runtime image dependencies."""
-import os
 import base64
+import os
 from pathlib import Path
 import tkinter as tk
 

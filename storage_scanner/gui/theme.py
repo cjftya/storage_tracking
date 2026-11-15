@@ -128,10 +128,8 @@ class ThemeManager:
             ("Title.TLabel", p["bg"], p["text"], ("Segoe UI", 16, "bold")),
             ("Section.TLabel", p["bg"], p["text"], ("Segoe UI", 12, "bold")),
             ("Muted.TLabel", p["bg"], p["muted"], ("Segoe UI", 10)),
-            ("Caption.TLabel", p["bg"], p["muted"], ("Segoe UI", 9, "bold")),
             ("Card.TLabel", p["card"], p["text"], ("Segoe UI", 10)),
             ("CardTitle.TLabel", p["card"], p["text"], ("Segoe UI", 11, "bold")),
-            ("CardCaption.TLabel", p["card"], p["muted"], ("Segoe UI", 9, "bold")),
             ("CardMuted.TLabel", p["card"], p["muted"], ("Segoe UI", 9)),
         ):
             s.configure(name, background=bg, foreground=fg, font=font)
