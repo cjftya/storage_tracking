@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import queue
+import os
 from threading import Thread, Lock
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -307,7 +308,9 @@ class ScannerApp:
                                   excluded_paths=self._lines(self.excludes_text))
             if self.scan_mode == "folder":
                 config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths,
-                                      allowed_paths=scope.allowed_paths)
+                                      allowed_paths=scope.allowed_paths,
+                                      workers=self.settings.get("folder_workers", 8 if os.name == "nt" else 1),
+                                      large_fetch=self.settings.get("large_fetch", os.name == "nt"))
             else:
                 config = ScanConfig(scope.roots, mib_to_bytes(self.minimum.get()),
                                     scope.excluded_paths, scope.boundary_paths,

@@ -50,6 +50,8 @@ class FolderResultStore:
             self._changes.add(parent)
 
     def add_batch(self, deltas):
+        direct = {}
+        roots = {}
         for delta in deltas:
             key = path_key(delta.path)
             root = next((r for r in self._roots if contains_path(r, key)), None)
@@ -57,17 +59,27 @@ class FolderResultStore:
                 raise ValueError("Invalid directory delta")
             if not delta.direct_bytes:
                 continue
-            with self._lock:
-                if self.finalized:
-                    raise RuntimeError("Folder results are finalized")
+            direct[key] = direct.get(key, 0) + delta.direct_bytes
+            roots[key] = root
+        with self._lock:
+            if self.finalized:
+                raise RuntimeError("Folder results are finalized")
+            affected = set()
+            for key, root in roots.items():
                 self._ensure(key, root)
-                node = self._nodes[key]
-                self._nodes[key] = replace(node, direct_bytes=node.direct_bytes + delta.direct_bytes)
-                while key is not None:
-                    node = self._nodes[key]
-                    self._nodes[key] = replace(node, size_bytes=node.size_bytes + delta.direct_bytes)
-                    self._changes.add(key)
+                while key is not None and key not in affected:
+                    affected.add(key)
                     key = self._parents[key]
+            totals = dict(direct)
+            for key in sorted(affected, key=len, reverse=True):
+                value = totals[key]
+                node = self._nodes[key]
+                self._nodes[key] = replace(node, size_bytes=node.size_bytes + value,
+                                           direct_bytes=node.direct_bytes + direct.get(key, 0))
+                self._changes.add(key)
+                parent = self._parents[key]
+                if parent is not None:
+                    totals[parent] = totals.get(parent, 0) + value
 
     def finish(self, *, complete, should_stop=lambda: False):
         # Collector is the sole writer. Sort each child index outside the lock;

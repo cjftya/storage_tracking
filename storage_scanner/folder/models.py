@@ -11,8 +11,14 @@ class FolderConfig:
     progress_interval: float = 0.2
     cancellation_check_interval: int = 128
     allowed_paths: tuple[str, ...] = ()
+    workers: int = 1
+    large_fetch: bool = False
 
     def __post_init__(self):
+        if type(self.workers) is not int or self.workers not in (1, 2, 4, 8):
+            raise ValueError("Folder workers must be 1, 2, 4 or 8")
+        if not isinstance(self.large_fetch, bool):
+            raise ValueError("large_fetch must be boolean")
         if not 256 <= self.batch_size <= 1024:
             raise ValueError("Batch size must be between 256 and 1024")
         if self.flush_interval <= 0 or self.progress_interval <= 0:

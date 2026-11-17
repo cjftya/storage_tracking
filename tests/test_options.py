@@ -9,6 +9,29 @@ from storage_scanner.platform_fs.volumes import Discovery, ScanScope, make_confi
 
 
 class OptionTests(unittest.TestCase):
+    def test_folder_platform_defaults_and_config_overrides(self):
+        from types import SimpleNamespace
+        parser = argument_parser("test")
+        args = parser.parse_args([])
+        for name, workers, large in (("nt", 8, True), ("posix", 1, False)):
+            with patch("storage_scanner.options.os", SimpleNamespace(name=name)):
+                settings = load_settings(args)
+            self.assertEqual((settings["folder_workers"], settings["large_fetch"]), (workers, large))
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "config.json"
+            config.write_text(json.dumps({"folder_workers": 8, "large_fetch": True}))
+            with patch("storage_scanner.options.os", SimpleNamespace(name="posix")):
+                settings = load_settings(parser.parse_args(["--config", str(config)]))
+            self.assertEqual(settings["folder_workers"], 8)
+            settings = load_settings(parser.parse_args(["--config", str(config),
+                                                       "--folder-workers", "2", "--no-large-fetch"]))
+            self.assertEqual((settings["folder_workers"], settings["large_fetch"]), (2, False))
+            for data in ({"folder_workers": True}, {"folder_workers": 3},
+                         {"folder_workers": 8.0}, {"large_fetch": "false"}):
+                config.write_text(json.dumps(data))
+                with self.subTest(data=data), self.assertRaises(ValueError):
+                    load_settings(parser.parse_args(["--config", str(config)]))
+
     def test_scope_has_no_file_model_and_preserves_policy(self):
         root = str(Path.cwd())
         mandatory = str(Path(root) / "mandatory")

@@ -36,6 +36,29 @@ Windows와 Linux의 로컬 스토리지에서 용량을 많이 차지하는 폴�
 
 보고서 생성은 검색이 끝난 뒤 백그라운드에서 진행합니다. 경로 수와 저장 장치에 따라 시간이 걸릴 수 있으며, 저장 완료 전 앱을 종료하면 보고서 저장이 끝나지 않을 수 있습니다. 보고서는 경로 목록이므로 파일 내용·용량 분석 자료는 포함하지 않습니다.
 
+## 폴더 스캔 최적화
+
+앱과 폴더 벤치마크의 기본값은 Windows에서 **작업자 8개 + 대량 디렉터리 조회**, Linux에서 **작업자 1개 + `os.scandir`**입니다. Windows는 `FindFirstFileExW`의 `FindExInfoBasic`과 `FIND_FIRST_EX_LARGE_FETCH`를 사용하며 일반 항목의 이름·속성·64비트 크기를 재사용합니다. 긴 절대 경로와 UNC 경로를 지원합니다. API나 옵션이 지원되지 않는 시작 오류에만 `os.scandir`로 전환하고, 접근 오류와 중간 조회 오류는 스캔 오류로 집계합니다.
+
+작업자는 폴더별 로컬 스택을 탐색하며 빈 작업자에게 발견한 자식 폴더를 부모 열거가 끝나기 전에도 넘깁니다. 파일별 스레드나 Future를 만들지 않습니다. 작업자 결과 채널은 작업자 수 × 2개 메시지, 컨트롤러 수집 큐는 8개 배치로 제한합니다. 결과 콜백은 조정 스레드에서 호출되며 GUI는 기존 수집 스레드와 RAM 인덱스를 사용합니다. 취소 시 이미 조사한 결과의 마지막 배치를 유지하고, 대기 중인 OS 호출을 강제 종료하거나 경로를 생략하지 않습니다. 전체 경로 스택과 결과 인덱스의 메모리는 고정 상한이 없습니다.
+
+```powershell
+python main.py "C:\Data" --mode folder
+python main.py "C:\Data" --mode folder --folder-workers 8 --no-large-fetch
+python -m storage_scanner.folder.benchmark "C:\Data" --store --folder-workers 8 --large-fetch
+```
+
+```bash
+python3 main.py /home --mode folder
+python3 -m storage_scanner.folder.benchmark /home --store --folder-workers 1
+```
+
+`--folder-workers`는 1·2·4·8개를 지원합니다. JSON의 `folder_workers`, `large_fetch`로도 지정하며 CLI가 우선합니다. JSON에 작업자 8개를 명시하면 Linux에서도 8개를 사용합니다. Linux에서는 대량 조회 설정과 관계없이 `os.scandir`를 사용합니다. OS별 기본값을 유지하려면 JSON에서 두 키를 생략하세요. 엔진 API의 `FolderConfig` 자체 기본값은 `workers=1`, `large_fetch=False`이므로 직접 호출할 때 필요한 값을 명시해야 합니다. 파일 검색 모드는 기존 엔진을 유지합니다.
+
+기본 제외·마운트 경계·링크 정책과 논리적 크기 집계 의미는 동일합니다. 성능은 저장장치, 캐시와 OS 호출 지연에 따라 달라집니다. 작업자/열거기 조합은 같은 고정 데이터에서 파일 수·오류·바이트·폴더별 직접/누적 용량을 먼저 비교하고, 실제 드라이브에서는 여러 번 교차 측정하세요. 이 저장소에서 실제 드라이브의 개선율을 새로 측정하지 않았습니다.
+
+Windows API 참고: [Microsoft FindFirstFileExW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfileexw).
+
 ## 실행
 
 Python **3.12 이상**과 Tkinter가 필요합니다. pip 의존성은 없습니다. Windows Python에는 보통 Tkinter가 포함됩니다. Linux에서는 배포판의 Tk 패키지(예: `python3-tk`)와 그래픽 세션이 필요합니다. GUI 없는 벤치마크는 Tkinter 없이 실행됩니다.

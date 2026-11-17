@@ -5,6 +5,7 @@ import time
 from collections.abc import Callable
 
 from storage_scanner.platform_fs.filters import PathFilter
+from storage_scanner.platform_fs.enumeration import scandir
 from storage_scanner.folder.models import DirectoryDelta, FolderConfig, FolderProgress, FolderSummary
 from storage_scanner.platform_fs.paths import directory_is_link, path_key, validate_scan_roots, entry_path_key
 
@@ -12,6 +13,17 @@ from storage_scanner.platform_fs.paths import directory_is_link, path_key, valid
 def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], None],
          on_progress: Callable[[FolderProgress], None] = lambda p: None,
          should_cancel: Callable[[], bool] = lambda: False) -> FolderSummary:
+    excluded = PathFilter(config.excluded_paths, allowed_paths=config.allowed_paths)
+    roots = tuple(dict.fromkeys(path_key(p) for p in config.roots))
+    validate_scan_roots(roots, excluded, directories_only=True)
+    if config.workers > 1:
+        from storage_scanner.folder.parallel import scan_parallel
+        return scan_parallel(config, roots, on_batch, on_progress, should_cancel)
+    return _scan_serial(config, on_batch, on_progress, should_cancel, roots)
+
+
+def _scan_serial(config, on_batch, on_progress, should_cancel, work_roots, share=lambda p: False):
+    """Walk local stacks; optional scheduler supplies and accepts directory subtrees."""
     started = time.perf_counter()
     last_flush = last_progress = started
     files = directories = total_bytes = errors = 0
@@ -36,8 +48,7 @@ def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], 
             on_progress(FolderProgress(files, directories, total_bytes, errors, current))
             last_progress = now
 
-    inspected = validate_scan_roots(roots, excluded, directories_only=True)
-    for root, info in inspected:
+    for root in work_roots:
         if should_cancel():
             cancelled = True
             break
@@ -50,7 +61,7 @@ def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], 
             direct_bytes = 0
             mounted_children = boundary_names.get(entry_path_key(current), ())
             try:
-                with os.scandir(current) as entries:
+                with scandir(current, large_fetch=config.large_fetch) as entries:
                     directories += 1
                     for index, entry in enumerate(entries, 1):
                         try:
@@ -59,7 +70,8 @@ def scan(config: FolderConfig, on_batch: Callable[[tuple[DirectoryDelta, ...]], 
                                     child = entry.path
                                     child_key = entry_path_key(child)
                                     if child_key not in boundaries and not excluded.excludes_key(child_key):
-                                        stack.append(child)
+                                        if not share(child):
+                                            stack.append(child)
                             elif entry.is_file(follow_symlinks=False) and not (
                                     mounted_children and entry_path_key(entry.name) in mounted_children):
                                 info = entry.stat(follow_symlinks=False)

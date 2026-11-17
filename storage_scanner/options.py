@@ -1,6 +1,7 @@
 """Shared command-line configuration, using only the standard library."""
 import argparse
 import json
+import os
 from pathlib import Path
 
 from storage_scanner.core.filters import mib_to_bytes
@@ -17,6 +18,10 @@ def argument_parser(description):
     parser.add_argument("--include-removable", action="store_true", help="Include removable local volumes")
     parser.add_argument("--no-default-excludes", action="store_true", help="Disable optional system path exclusions")
     parser.add_argument("--config", type=Path, help="JSON configuration file (see config.example.json)")
+    parser.add_argument("--folder-workers", type=int, choices=(1, 2, 4, 8), default=None,
+                        help="Folder workers (Windows: 8, Linux: 1)")
+    parser.add_argument("--large-fetch", action=argparse.BooleanOptionalAction, default=None,
+                        help="Windows folder bulk enumeration (enabled on Windows)")
     return parser
 
 
@@ -43,7 +48,17 @@ def load_settings(args):
     if theme not in ("system", "day", "night"):
         raise ValueError("theme_mode must be system, day or night")
     roots = args.roots or data.get("roots")
+    workers = args.folder_workers if args.folder_workers is not None else data.get(
+        "folder_workers", 8 if os.name == "nt" else 1)
+    large_fetch = args.large_fetch if args.large_fetch is not None else data.get(
+        "large_fetch", os.name == "nt")
+    if type(workers) is not int or workers not in (1, 2, 4, 8):
+        raise ValueError("folder_workers must be 1, 2, 4 or 8")
+    if not isinstance(large_fetch, bool):
+        raise ValueError("large_fetch must be boolean")
     return {
+        "folder_workers": workers,
+        "large_fetch": large_fetch,
         "scan_mode": mode,
         "theme_mode": theme,
         "roots": tuple(path_key(p) for p in roots) if roots is not None else None,

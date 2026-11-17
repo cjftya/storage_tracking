@@ -23,7 +23,8 @@ def main(argv=None):
         settings = load_settings(args)
         _, scope = configured_scope(settings)
         config = FolderConfig(scope.roots, scope.excluded_paths, scope.boundary_paths,
-                              allowed_paths=scope.allowed_paths)
+                              allowed_paths=scope.allowed_paths,
+                              workers=settings["folder_workers"], large_fetch=settings["large_fetch"])
         stop = Event()
         previous = signal.signal(signal.SIGINT, lambda signum, frame: stop.set())
         store = FolderResultStore(config.roots) if args.store else None
@@ -49,6 +50,7 @@ def main(argv=None):
         output.update(finalize_seconds=finalize_seconds, index_seconds=index_seconds,
                       stored_folders=store.folder_count if store else 0)
         output.update(roots=config.roots, excluded_paths=config.excluded_paths,
+                      folder_workers=config.workers, large_fetch=config.large_fetch,
                       scan_mode="folder", platform=platform.platform(),
                       python=platform.python_version(), store_enabled=args.store,
                       files_per_second=summary.files_scanned / max(summary.elapsed_seconds, 1e-9),
